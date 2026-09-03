@@ -1,51 +1,60 @@
 import { createSupabaseClient } from '@/supabase-clients/server';
 import { cache } from 'react';
 
-// Only meant to be used in protected pages
-// This makes an extra call to the server to verify the user is still logged in
-// Use sparingly
+// Verified user call with Supabase Auth server
 export const getCachedLoggedInVerifiedSupabaseUser = cache(async () => {
-  const supabase = await createSupabaseClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error) {
-    throw error;
+  try {
+    const supabase = await createSupabaseClient();
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data?.user) {
+      return { user: null };
+    }
+    return data;
+  } catch {
+    return { user: null };
   }
-  return data;
 });
 
-// Only meant to be used in protected pages
-// This doesn't verify the token with the server, it only validates the stored token
+// Authenticated Supabase User object
 export const getCachedLoggedInSupabaseUser = cache(async () => {
-  const supabase = await createSupabaseClient();
-  const { data, error } = await supabase.auth.getSession();
-  if (error) {
-    throw error;
+  try {
+    const supabase = await createSupabaseClient();
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data?.user) {
+      return null;
+    }
+    return data.user;
+  } catch {
+    return null;
   }
-  if (!data.session?.user) {
-    throw new Error('No user found');
-  }
-  return data.session.user;
 });
 
+// Decoded JWT Claims
 export const getCachedLoggedInUserClaims = cache(async () => {
-  const supabase = await createSupabaseClient();
-  const { data, error } = await supabase.auth.getClaims();
-  if (error) {
-    throw error;
+  try {
+    const supabase = await createSupabaseClient();
+    const { data, error } = await supabase.auth.getClaims();
+    if (error || !data?.claims) {
+      return null;
+    }
+    return data.claims;
+  } catch {
+    return null;
   }
-  if (!data?.claims) {
-    throw new Error('No claims found');
-  }
-  return data.claims;
 });
 
-
+// Boolean check for authentication (safe - never throws)
 export const getCachedIsUserLoggedIn = cache(async () => {
   const claims = await getCachedLoggedInUserClaims();
-  return claims.sub !== null;
+  if (claims?.sub) return true;
+  const user = await getCachedLoggedInSupabaseUser();
+  return !!user?.id;
 });
 
+// User ID getter (safe - returns string or null)
 export const getCachedLoggedInUserId = cache(async () => {
   const claims = await getCachedLoggedInUserClaims();
-  return claims.sub;
+  if (claims?.sub) return claims.sub;
+  const user = await getCachedLoggedInSupabaseUser();
+  return user?.id || null;
 });

@@ -23,18 +23,24 @@ const robotoMono = localFont({
   display: 'swap',
 });
 
+import { siteConfig } from '@/config/site';
+
 export const metadata = {
   title: {
-    default: 'Nextbase',
-    template: '%s · Nextbase',
+    default: `${siteConfig.name} — ${siteConfig.tagline}`,
+    template: `%s · ${siteConfig.name}`,
   },
-  description:
-    'An open-source Next.js and Supabase starter for shipping secure products faster.',
+  description: siteConfig.description,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${robotoMono.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${robotoMono.variable}`}
+    >
       <head />
       <body>
         <DynamicLayoutProviders>

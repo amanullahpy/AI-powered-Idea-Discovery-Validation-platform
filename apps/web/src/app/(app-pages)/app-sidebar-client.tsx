@@ -2,12 +2,16 @@
 
 import type { User } from '@supabase/supabase-js';
 import {
+  Bookmark,
   ChevronUp,
+  Compass,
   ExternalLink,
   LayoutDashboard,
-  LockKeyhole,
+  Lightbulb,
   LogOut,
   Plus,
+  Settings,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -38,7 +42,11 @@ import { signOutAction } from '@/data/auth/sign-out';
 
 const navigationItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Private items', url: '/private-items', icon: LockKeyhole },
+  { title: 'AI Co-pilot', url: '/ai', icon: Sparkles },
+  { title: 'Discover Ideas', url: '/discover', icon: Compass },
+  { title: 'My Ideas', url: '/ideas', icon: Lightbulb },
+  { title: 'Saved Ideas', url: '/saved', icon: Bookmark },
+  { title: 'Settings', url: '/settings', icon: Settings },
 ];
 
 export function AppSidebarContent({ user }: { user: User }) {
@@ -68,11 +76,11 @@ export function AppSidebarContent({ user }: { user: User }) {
     <>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
-          <SidebarGroupAction asChild title="Create private item">
-            <Link href="/dashboard/new">
+          <SidebarGroupLabel>Idea Discovery</SidebarGroupLabel>
+          <SidebarGroupAction asChild title="New AI Idea">
+            <Link href="/ai">
               <Plus aria-hidden="true" />
-              <span className="sr-only">Create private item</span>
+              <span className="sr-only">New AI Idea</span>
             </Link>
           </SidebarGroupAction>
           <SidebarGroupContent>

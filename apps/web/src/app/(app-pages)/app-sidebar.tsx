@@ -12,6 +12,8 @@ import {
 import { getCachedLoggedInVerifiedSupabaseUser } from '@/rsc-data/supabase';
 import { AppSidebarContent } from './app-sidebar-client';
 
+import { siteConfig } from '@/config/site';
+
 async function SidebarHeaderContent() {
   'use cache';
 
@@ -19,7 +21,7 @@ async function SidebarHeaderContent() {
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" asChild tooltip="Nextbase home">
+          <SidebarMenuButton size="lg" asChild tooltip={`${siteConfig.name} home`}>
             <Link href="/">
               <Brand showTagline />
             </Link>
@@ -32,6 +34,7 @@ async function SidebarHeaderContent() {
 
 async function SidebarContentWrapper() {
   const { user } = await getCachedLoggedInVerifiedSupabaseUser();
+  if (!user) return null;
   return <AppSidebarContent user={user} />;
 }
 

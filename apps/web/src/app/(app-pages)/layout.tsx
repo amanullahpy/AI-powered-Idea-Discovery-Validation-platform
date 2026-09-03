@@ -1,5 +1,6 @@
 import { Suspense, type ReactNode } from 'react';
 import { redirect } from 'next/navigation';
+import { connection } from 'next/server';
 
 import { DynamicBreadcrumb } from '@/components/dynamic-breadcrumb';
 import { ModeToggle } from '@/components/ui/mode-toggle';
@@ -13,6 +14,7 @@ import { getCachedIsUserLoggedIn } from '@/rsc-data/supabase';
 import { AppSidebar } from './app-sidebar';
 
 async function AuthGuard({ children }: { children: ReactNode }) {
+  await connection();
   const isLoggedIn = await getCachedIsUserLoggedIn();
   if (!isLoggedIn) redirect('/login');
   return <>{children}</>;

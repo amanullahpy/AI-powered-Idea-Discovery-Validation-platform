@@ -1,6 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { match } from 'path-to-regexp';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -34,22 +33,30 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). Extra work here can make session refresh bugs hard
   // to diagnose.
 
-  const protectedPages = [
+  const protectedPrefixes = [
     '/dashboard',
+    '/onboarding',
+    '/ai',
+    '/ideas',
+    '/saved',
+    '/settings',
+    '/profile',
     '/private-item',
     '/private-items',
-    '/items',
-    '/item',
-  ] as const;
+  ];
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (
-    !user &&
-    protectedPages.some((page) => match(page)(request.nextUrl.pathname))
-  ) {
+  const pathname = request.nextUrl.pathname;
+  const isPublicIdea = pathname.startsWith('/ideas/public/') || pathname.startsWith('/public/ideas/');
+
+  const isProtected =
+    !isPublicIdea &&
+    protectedPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+
+  if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
