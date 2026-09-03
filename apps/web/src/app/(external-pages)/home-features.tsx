@@ -16,13 +16,12 @@ export function HomeFeatures({ features }: HomeFeaturesProps) {
     <section className="px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <p className="text-sm font-medium text-muted-foreground">Built to ship</p>
+          <p className="text-sm font-medium text-primary font-semibold">From Spark to Validation</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Everything you need, already connected
+            Everything you need to discover and validate high-conviction ideas
           </h2>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Spend your time on the product instead of rebuilding the same
-            foundation for every project.
+            Stop guessing what to build. Use intelligent matchmaking, automated validation checklists, and AI co-pilots to launch with confidence.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

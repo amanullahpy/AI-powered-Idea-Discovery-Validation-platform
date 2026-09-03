@@ -3,12 +3,23 @@ function getSiteUrl() {
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
     process.env.NEXT_PUBLIC_VERCEL_URL ??
-    'https://my-awesome-saas.com';
+    'http://localhost:3000';
 
   return siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`;
 }
 
 module.exports = {
   siteUrl: getSiteUrl(),
-  generateRobotsTxt: true,
+  generateRobotsTxt: false, // We use native Next.js 16 app/robots.ts
+  generateIndexSitemap: false,
+  exclude: [
+    '/dashboard*',
+    '/onboarding*',
+    '/settings*',
+    '/ai*',
+    '/ideas/*',
+    '/saved*',
+    '/auth/*',
+    '/private-item*',
+  ],
 };

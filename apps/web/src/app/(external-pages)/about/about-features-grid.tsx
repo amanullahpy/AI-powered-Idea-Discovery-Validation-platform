@@ -1,5 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
-import { Database, LockKeyhole, Palette, Rocket, ShieldCheck, Zap } from 'lucide-react';
+import {
+  BookmarkCheck,
+  BrainCircuit,
+  Compass,
+  Layers,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react';
 
 import {
   Card,
@@ -8,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { siteConfig } from '@/config/site';
 
 interface Feature {
   icon: LucideIcon;
@@ -17,40 +25,40 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    icon: Rocket,
-    title: 'Next.js 16',
+    icon: Compass,
+    title: 'Extensible Idea Taxonomy',
     description:
-      'App Router, Server Components, Server Actions, and modern caching patterns in a production-ready structure.',
+      'Database-driven categories spanning Micro-SaaS, AI agents, dev tools, e-commerce, and mobile apps with hierarchical tag filters.',
   },
   {
-    icon: Database,
-    title: 'Supabase',
+    icon: BrainCircuit,
+    title: 'AI Ideation Co-pilot',
     description:
-      'PostgreSQL, authentication, generated types, migrations, and local development are already connected.',
+      'Gemini-powered brainstorming that responds to constraints, narrows down technical scope, and generates actionable MVP specs.',
   },
   {
     icon: ShieldCheck,
-    title: 'Type-safe by default',
+    title: 'Validation & Moat Audits',
     description:
-      'TypeScript, Zod, and generated database types keep contracts clear from forms through data access.',
+      'Step-by-step checklist auditing market demand, competition risks, distribution channels, and defensible moats.',
   },
   {
-    icon: Palette,
-    title: 'shadcn/ui system',
+    icon: Layers,
+    title: 'Personalized Scoring',
     description:
-      'Accessible components, semantic tokens, responsive layouts, and dark mode form one coherent interface.',
+      'Weighted recommendation engine aligning concepts with your specific programming skills, available hours, and budget.',
   },
   {
-    icon: LockKeyhole,
-    title: 'Complete authentication',
+    icon: BookmarkCheck,
+    title: 'Private Idea Cockpit',
     description:
-      'Password, magic link, OAuth-ready providers, recovery flows, and protected routes are included.',
+      'Save, organize, track validation stages, and compare opportunities side-by-side backed by Supabase Row-Level Security.',
   },
   {
     icon: Zap,
-    title: 'Developer experience',
+    title: 'Modern Architecture',
     description:
-      'Fast local setup, Turborepo tasks, linting, testing, and clear package boundaries keep iteration quick.',
+      'Built on Next.js 16 App Router, Supabase Postgres, Tailwind CSS 4, and shadcn/ui for speed, security, and developer joy.',
   },
 ];
 
@@ -58,12 +66,12 @@ export function AboutFeaturesGrid() {
   return (
     <section className="space-y-10">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-medium text-muted-foreground">The foundation</p>
+        <p className="text-sm font-semibold text-primary">Core Pillars</p>
         <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Built for product teams and independent developers
+          Engineered for builders, indie hackers, and founders
         </h2>
         <p className="mt-4 leading-7 text-muted-foreground">
-          The stack stays intentionally familiar, composable, and easy to own.
+          Every tool inside {siteConfig.name} is designed to minimize risk and shorten the time from initial curiosity to shipping code.
         </p>
       </div>
 

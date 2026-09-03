@@ -1,433 +1,273 @@
-# NextBase Starter — Open Source Next.js + Supabase Boilerplate
+# IdeaForge — AI-Powered Idea Discovery & Validation Platform
 
-> A production-grade Next.js 16 + Supabase foundation. Free, MIT-licensed, and ready to clone.
+<div align="center">
 
-NextBase Starter is the open-source baseline of the [NextBase](https://usenextbase.com) family — an opinionated, tested starting point for SaaS teams building on Next.js 16 and Supabase. It bundles the auth, RLS, monorepo, and caching patterns that you would otherwise spend weeks deriving from scratch.
+![IdeaForge Logo](./apps/web/public/logos/ideaforge-logo.svg)
 
-- **Demo:** _[live demo URL]_
-- **Documentation:** _[docs URL]_
-- **Changelog:** see [`CHANGELOG.md`](./CHANGELOG.md)
-- **License:** MIT — see [`LICENSE`](./LICENSE)
+### Discover, personalize, validate, and launch high-conviction business and project ideas.
 
-> **Need more than the starter?** Stripe billing, teams & orgs, RBAC admin, transactional emails, multi-tenancy, AI starter kits — all built on the same patterns — ship as **premium NextBase kits**. **[→ See the premium kits at usenextbase.com](https://usenextbase.com)**
+[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%2B%20RLS-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS%204-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-Radix%20Primitives-black?style=flat-square)](https://ui.shadcn.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
+
+[Features](#features) • [Architecture](#architecture) • [Getting Started](#getting-started) • [Database Schema](#database-schema--security) • [AI Co-pilot](#ai-co-pilot--synthesizer) • [Taxonomy](#taxonomy--categories)
+
+</div>
 
 ---
 
-## Why this exists
+## Executive Summary
 
-Every SaaS team writes the same code in the first sprint and the same code in the first incident:
+Most software projects, side hustles, and startups fail before writing a single line of code because founders build solutions without validating customer pain, defensibility, or personal skill-market fit.
 
-- A "simple" Supabase auth integration that quietly breaks SSR cookies after a refresh, then again after a deploy.
-- An RLS policy that looked right in review and silently leaked a row in production.
-- A server-action layer that was supposed to be type-safe but ended up being three subtly different patterns across the codebase.
-- A monorepo that started clean and devolved into a tangle of relative imports and untyped envs.
-- A "we'll add caching later" that turns into a `revalidatePath` archaeology dig six months in.
+**IdeaForge** is an open-source, full-stack platform designed to guide entrepreneurs, indie makers, students, and engineers through the entire ideation lifecycle:
 
-NextBase compresses all of that prior art into a maintained, opinionated starter. You inherit decisions that have already failed in production somewhere else, so they don't have to fail in yours.
+```text
+Discover → Personalize → Brainstorm → Save → Refine → Validate → Compare → Plan → Build → Launch
+```
+
+Built upon a production-grade **Next.js 16 (App Router)** and **Supabase (PostgreSQL + RLS)** foundation, IdeaForge provides personalized recommendations, AI-powered conversational scoping, structured validation audits, and automated MVP blueprints.
 
 ---
 
 ## Features
 
-### Authentication
-- **Supabase Auth, SSR-correct.** `@supabase/ssr` clients for browser, server components, server actions, and middleware — wired so cookies survive every render boundary in Next.js 16.
-- **Multiple sign-in methods out of the box:** email + password, passwordless magic link, and OAuth (Google, GitHub, Twitter — add more in minutes).
-- **Hardened middleware.** A single source of truth for protected routes (`/dashboard`, `/private-item`, `/private-items`, …) using `path-to-regexp` matching and `supabase.auth.getUser()` re-verification on every request.
-- **Battle-tested flows.** Sign-up, sign-in, sign-out, email confirmation, forgot-password, update-password, and OAuth callback / code-error pages — all implemented as Server Actions and tested.
+### 1. Personalized Idea Match Engine
+- **Multi-Step Onboarding Questionnaire:** Personalizes recommendations based on your technical skills, weekly time availability, capital budget, domain interests, and target markets.
+- **Weighted Compatibility Scoring:** Dynamic algorithm scores every concept against your profile (`0%` to `100%` match) with transparent breakdowns of why an idea fits your background.
+- **Profile Tuning:** Update your skills, budget brackets, and goals anytime via `/settings` to recalculate recommendation rankings in real time.
 
-### Database, Permissions & Multi-Tenancy
-- **Supabase Postgres with Row Level Security from day one.** Every user-owned table ships with `SELECT`/`INSERT`/`UPDATE`/`DELETE` policies keyed off `auth.uid()`.
-- **Versioned migrations.** Real timestamped SQL migrations under `apps/database/supabase/migrations` — not a hand-edited single file.
-- **Generated database types.** `pnpm gen-types` (remote) and `pnpm gen-types-local` (local) regenerate `database.types.ts` so every query is end-to-end typed.
-- **pgTAP-ready test harness.** A test scaffold under `apps/database/supabase/tests` for asserting RLS policies, triggers, and constraints.
-- **`updated_at` triggers** standardized via a single `public.set_updated_at()` function — applied per-table, not duplicated.
+### 2. Extensible 15+ Idea Taxonomy
+- **Database-Driven Hierarchy:** Browse and filter opportunities across 15 initial categories:
+  - **SaaS** (Micro-SaaS, B2B, B2C, Vertical SaaS)
+  - **AI Products** (Autonomous Agents, API Wrappers, Multi-modal tools)
+  - **Mobile Apps** (iOS, Android, Cross-platform)
+  - **Web Applications**
+  - **Developer Tools & Infrastructure**
+  - **Side Hustles & Solopreneur Ventures**
+  - **Small / Local Business Automation**
+  - **E-Commerce & Digital Products**
+  - **Final Year Projects (FYP) & Academic Research**
+  - **Workflow Automation & No-Code Systems**
+- **Rich Filtering:** Filter by category, difficulty level (Beginner / Intermediate / Advanced), budget bracket, and time commitment.
 
-### Server Actions, Validation & Data Layer
-- **`next-safe-action` everywhere.** All mutating endpoints are Zod-validated, typed end-to-end, and ship with two pre-built clients:
-  - `actionClient` — base client with development-time perf + payload logging middleware.
-  - `authActionClient` — extends the base client and injects `ctx.userId` for the current user, refusing unauthenticated calls.
-- **Clean data-access separation.** Queries are partitioned by trust boundary:
-  - `src/data/anon/*` — anonymous, public reads
-  - `src/data/auth/*` — authentication flows (sign-in, sign-up, sign-out)
-  - `src/data/user/*` — authenticated user data (RLS-enforced)
-  - `src/rsc-data/*` — React Server Component data fetchers
-- **Optional `effect-ts` integration.** Composable `Effect`-based query helpers and typed Supabase error mapping under `src/utils/effect-*` for teams that want railway-oriented data flow without leaking it into every file.
+### 3. Conversational AI Idea Co-Pilot
+- **Multi-Turn Brainstorming:** Chat with your AI co-pilot (`/ai`) to explore niches, pivot directions, and challenge assumptions.
+- **Constraint Tuning:** Instruct the AI to *"make it simpler for a solo dev"*, *"reduce timeline to 2 weeks"*, or *"shift monetization to usage-based pricing"*.
+- **Structured Idea Synthesis:** Powered by Gemini AI with an integrated zero-config synthesizer fallback, returning actionable JSON specifications (MVP features, target personas, pricing tiers, and risks).
+- **Direct Save to Cockpit:** One-click save from AI chats directly into your private ideas workspace.
 
-### Caching, Performance & UX
-- **Next.js 16 Cache Components (`cacheComponents: true`).** Static-by-default rendering with surgical `"use cache"` boundaries, plus a written guide ([`docs/NEXTJS_CACHE_COMPONENTS.md`](./docs/NEXTJS_CACHE_COMPONENTS.md)) explaining exactly when and how to use each primitive.
-- **Suspense-first data fetching** via `createSuspenseResource` and TanStack Query — clean loading boundaries, no waterfall fetches.
-- **Turbopack dev server** for sub-second HMR on real-world component trees.
-- **Optimized `next/image` remote patterns** preconfigured for Supabase Storage and Unsplash.
+### 4. Deep Validation Cockpit & Moat Audits
+- **Validation Checklist:** Pre-populated checklists covering problem verification, willingness-to-pay signals, competitor moats, and customer acquisition channels.
+- **Competitor & Risk Matrix:** Inspect existing market solutions, identify gaps, and document risk factors before investing development hours.
+- **Unit Economics & Financial Estimations:** View estimated initial capital, runway requirements, target pricing, and break-even targets.
 
-### UI & Developer Experience
-- **shadcn/ui pre-installed** with the full Radix primitive set (40+ components: dialogs, command palettes, sidebars, sheets, toasts, hover cards, OTP input, …) — ready to copy, paste, and customize.
-- **Tailwind CSS v4** via `@tailwindcss/postcss`, including `@tailwindcss/forms` and `@tailwindcss/typography`.
-- **Framer Motion**, **Embla Carousel**, **cmdk**, **input-otp**, **Lucide icons**, **date-fns**, **React Hot Toast** — the entire baseline UI toolkit you would have installed in week one.
-- **React Bits** animated components (BlurText, ShinyText, SpotlightCard) installed via the shadcn registry and used on the home page and login screen.
-- **TypeScript** with shared `packages/typescript-config`, `oxlint` + `oxfmt` (Oxc-based, ~50× faster than ESLint+Prettier), and centralized Zod schemas in `src/utils/zod-schemas`.
-- **Tested.** Vitest + Testing Library for unit, Playwright for E2E — both already wired into Turbo pipelines.
+### 5. Private Workspace & Lifecycle Management
+- **Full Idea Lifecycle:** Track ideas across stages: `Discovered` → `Evaluating` → `Validating` → `Building` → `Archived`.
+- **Visibility Controls:** Toggle ideas between **Private** (strictly protected by Supabase RLS), **Public** (indexed in directory), and **Unlisted** (shareable via private link).
+- **Side-by-Side Comparison:** Compare multiple ideas simultaneously across effort, capital, market size, and match scores.
 
-### Infrastructure, Observability & Releases
-- **Turborepo monorepo** (`apps/*`, `packages/*`) with `pnpm` workspaces and pipelined `build`, `lint`, `test`, `typecheck`, `gen-types`, `test:e2e` tasks.
-- **Local Supabase stack** lifecycle scripts: `pnpm database#start | stop | status`.
-- **Changesets-based release automation.** Every shippable change ships with a changeset; an automated "Version Packages" PR rolls them into a single bumped release, syncs `apps/web` versions, and cuts a GitHub release.
-- **GitHub Actions starter workflows** (Playwright + coverage) included.
-- **SEO baked in:** `next-seo`, `next-sitemap` postbuild, JSON-LD and Open Graph helpers.
+### 6. Public Directory & SEO Pages
+- **Public Showcase (`/discover`):** Fast, paginated discovery directory with real-time text search and category badges.
+- **SEO-Optimized Public Pages (`/ideas/public/[slug]`):** Static and dynamic rendering with OpenGraph tags, JSON-LD schema, and social cards.
 
 ---
 
-## Screenshots
+## Tech Stack
 
-> _Replace these placeholders with your branded captures once you customize the marketing surfaces._
-
-| | |
-|---|---|
-| **Landing & marketing** — the `(external-pages)` route group, including the home page and `/about`, ready to be replaced with your positioning. | _[screenshot]_ |
-| **Authentication** — login / sign-up / magic-link / forgot-password screens with provider buttons (Google, GitHub, Twitter). | _[screenshot]_ |
-| **Dashboard** — the authenticated `(app-pages)` shell with sidebar, breadcrumbs, and a CRUD reference page. | _[screenshot]_ |
-| **Private items CRUD** — RLS-protected list, detail (`/private-item/[id]`), and create-new flows demonstrating the full data path. | _[screenshot]_ |
-
----
-
-## Tech stack
-
-| Layer | Choice |
-|---|---|
-| Framework | Next.js 16 (App Router, Cache Components, Turbopack) |
-| UI runtime | React 19 |
-| Language | TypeScript (`strictNullChecks` enabled) |
-| Database & Auth | Supabase (Postgres, RLS, Auth, Storage) |
-| Auth SSR | `@supabase/ssr` |
-| Server Actions | `next-safe-action` + Zod |
-| Effects (optional) | `effect` + `@effect/platform` |
-| Data fetching | TanStack Query + React Suspense |
-| UI primitives | shadcn/ui on Radix UI |
-| Styling | Tailwind CSS v4 (PostCSS) + Tailwind Forms / Typography |
-| Forms | React Hook Form + Zod resolvers |
-| Animation | Framer Motion |
-| Lint / Format | oxlint + oxfmt |
-| Unit / Integration tests | Vitest + Testing Library + jsdom |
-| E2E tests | Playwright |
-| Monorepo | Turborepo + pnpm workspaces |
-| Releases | Changesets |
-| SEO | `next-seo`, `next-sitemap` |
+| Layer | Technology | Description |
+|---|---|---|
+| **Framework** | [Next.js 16](https://nextjs.org/) | App Router, Server Components, Server Actions, Turbopack |
+| **UI Runtime** | [React 19](https://react.dev/) | React 19 concurrent features & Suspense |
+| **Styling** | [Tailwind CSS 4](https://tailwindcss.com/) | Modern utility styling via `@tailwindcss/postcss` |
+| **Design System** | [shadcn/ui](https://ui.shadcn.com/) + Radix | Accessible primitives (Dialogs, Sidebars, Sheets, Toasts) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) | Strict type checking end-to-end |
+| **Database** | [Supabase](https://supabase.com/) | Managed PostgreSQL 15+ with strict Row Level Security (RLS) |
+| **Authentication** | Supabase Auth (`@supabase/ssr`) | Email/password, Magic link, session cookie SSR resilience |
+| **Server Actions** | [`next-safe-action`](https://next-safe-action.dev/) | Type-safe, Zod-validated server mutations |
+| **Client State** | TanStack Query | Query caching for client-interactive views |
+| **AI Engine** | Google Gemini + Fallback Synthesizer | Conversational ideation & structured schema synthesis |
+| **Monorepo** | [Turborepo](https://turbo.build/) + `pnpm` | Fast monorepo pipelines (`build`, `test`, `lint`, `typecheck`) |
+| **Linter / Formatter** | `oxlint` + `oxfmt` | High-performance Oxc tooling |
 
 ---
 
-## Architecture overview
-
-NextBase is a Turborepo with two apps and shared config packages.
+## Architecture Overview
 
 ```
-nextbase-nextjs-supabase-starter/
+AI-powered-Idea-Discovery-Validation-platform/
 ├── apps/
-│   ├── web/                            # Next.js 16 application
+│   ├── web/                                 # Next.js 16 Web Application
 │   │   ├── src/
 │   │   │   ├── app/
-│   │   │   │   ├── (external-pages)/   # Public marketing routes
-│   │   │   │   ├── (auth-pages)/       # login, sign-up, forgot-password,
-│   │   │   │   │                       # update-password, auth/callback,
-│   │   │   │   │                       # auth/confirm, auth/auth-code-error
-│   │   │   │   ├── (app-pages)/        # Authenticated app shell:
-│   │   │   │   │                       # dashboard, private-items,
-│   │   │   │   │                       # private-item/[privateItemId]
-│   │   │   │   └── layout.tsx
-│   │   │   ├── components/             # shadcn/ui + auth components
-│   │   │   ├── data/
-│   │   │   │   ├── anon/               # Public, anonymous data access
-│   │   │   │   ├── auth/               # Auth flows (server actions)
-│   │   │   │   └── user/               # Authenticated, RLS-scoped queries
-│   │   │   ├── rsc-data/               # RSC-only fetchers
-│   │   │   ├── supabase-clients/       # browser / server / middleware
-│   │   │   ├── lib/                    # safe-action clients, utils
-│   │   │   ├── utils/                  # zod schemas, helpers, effect bridge
-│   │   │   ├── hooks/
-│   │   │   ├── contexts/
-│   │   │   └── styles/
-│   │   ├── e2e/                        # Playwright specs
-│   │   ├── playwright.config.ts
-│   │   ├── vitest.config.ts
-│   │   └── next.config.ts              # cacheComponents enabled
+│   │   │   │   ├── (external-pages)/        # Public landing, discover, about
+│   │   │   │   ├── (auth-pages)/            # Sign-in, sign-up, password recovery
+│   │   │   │   ├── (app-pages)/             # Authenticated workspace shell:
+│   │   │   │   │   ├── dashboard/           # Personalized home cockpit
+│   │   │   │   │   ├── ai/                  # AI conversational co-pilot
+│   │   │   │   │   ├── ideas/               # CRUD ideas & detail views
+│   │   │   │   │   ├── saved/               # Bookmarked ideas & comparisons
+│   │   │   │   │   ├── onboarding/          # Personalization wizard
+│   │   │   │   │   └── settings/            # Profile preferences & answers
+│   │   │   ├── components/                  # shadcn/ui & IdeaForge components
+│   │   │   ├── config/                      # site.ts brand & navigation config
+│   │   │   ├── data/                        # Server actions partitioned by domain:
+│   │   │   │   ├── ai/                      # AI chat & synthesis actions
+│   │   │   │   ├── ideas/                   # Idea CRUD & bookmarks
+│   │   │   │   └── user/                    # Profiles & onboarding preferences
+│   │   │   ├── lib/
+│   │   │   │   ├── ai/                      # Gemini provider & local synthesizer
+│   │   │   │   ├── recommendations/         # Personalization match scoring engine
+│   │   │   │   └── observability/           # Structured application logger
+│   │   │   └── rsc-data/                    # Server-Component-only Supabase queries
+│   │   └── public/                          # Logos, favicons, static media
 │   └── database/
 │       └── supabase/
-│           ├── migrations/             # Timestamped SQL migrations
-│           ├── tests/                  # pgTAP-style RLS / schema tests
-│           ├── seed.sql
-│           └── config.toml
-├── packages/
-│   └── typescript-config/              # Shared tsconfig presets
-├── docs/                               # Architecture & caching guides
-├── scripts/                            # Release & env sync scripts
-├── turbo.json
-├── pnpm-workspace.yaml
+│           ├── migrations/                  # Versioned SQL migrations:
+│           │   ├── 20260903000000_create_idea_platform_schema.sql
+│           │   ├── 20260903000001_seed_initial_taxonomy.sql
+│           │   └── 20260903000002_seed_sample_ideas.sql
+├── docs/                                    # PRD & Implementation Task Breakdowns
+├── packages/                                # Shared TypeScript configurations
+├── turbo.json                               # Turborepo task definitions
 └── package.json
 ```
 
-### Auth flow
-1. **Middleware** (`src/supabase-clients/middleware.ts`) instantiates a server Supabase client, calls `auth.getUser()` to re-verify the session, and redirects unauthenticated visitors away from protected route prefixes.
-2. **Server components** call `createSupabaseClient()` to read data under the user's RLS context.
-3. **Server actions** use `authActionClient` from `lib/safe-action.ts`, which short-circuits unauthenticated callers and injects `ctx.userId`.
-4. **OAuth & email confirmation** complete at `/auth/callback` and `/auth/confirm`, with `/auth/auth-code-error` for failures.
+---
 
-### Permissions model
-Authorization is enforced **at the database layer** via Postgres RLS — not in handler code. Every user-owned table has explicit `SELECT`/`INSERT`/`UPDATE`/`DELETE` policies that compare `auth.uid()` to ownership columns. Service-role access is gated separately. This means a forgotten check in a route handler cannot exfiltrate data; the database refuses the read.
+## Database Schema & Security
 
-### Caching strategy
-With `cacheComponents` enabled, route segments are static by default. Static UI (sidebars, breadcrumbs, headings, marketing) is marked `"use cache"`. Personalized data leaves caching off and uses Suspense. Cache invalidation happens via `revalidatePath()` from server actions. The full mental model is documented in [`docs/NEXTJS_CACHE_COMPONENTS.md`](./docs/NEXTJS_CACHE_COMPONENTS.md).
+IdeaForge implements strict **Row Level Security (RLS)** at the PostgreSQL layer. Data isolation is guaranteed even if application-level checks fail:
 
-### Server / client boundary
-- `lib/safe-action.ts` and all `data/*` modules are `'use server'` or `import 'server-only'`. They never leak into a client bundle.
-- Client interactivity is co-located: `ClientPage.tsx`, `*-client.tsx`, and explicit `'use client'` directives.
-- Browser Supabase access uses `supabase-clients/client.ts`; server uses `supabase-clients/server.ts` (cookies wired via `next/headers`).
+- **`categories`**, **`skills`**, **`goals`**, **`markets`**: Database-backed taxonomy; public read, service-role admin write.
+- **`profiles`**: Linked directly to `auth.users.id`. Auto-created via triggers/server actions upon registration.
+- **`user_preferences`**, **`user_skills`**, **`user_goals`**, **`user_markets`**: Personalization records keyed by `user_id = auth.uid()`.
+- **`ideas`**:
+  - `owner_id = auth.uid()` owns full read/write permissions.
+  - Public ideas (`visibility = 'public'`) allow global read access.
+  - Unlisted ideas (`visibility = 'unlisted'`) allow direct slug access.
+- **`idea_validation_items`**: Checklists, hypotheses, and proof metrics per idea.
+- **`saved_ideas`**: Bookmarks and custom user notes per idea.
+- **`ai_conversations`** & **`ai_messages`**: Private AI brainstorming session histories.
+- **`audit_events`**: Append-only security and activity logging.
 
 ---
 
-## Quick start
+## Getting Started
 
-### 1. Install
+### Prerequisites
+
+- **Node.js**: `v20.x` or `v22.x+` (Node 24 supported)
+- **Package Manager**: `pnpm` (version 10+)
+- **Supabase**: Local CLI or hosted Supabase project
+
+### 1. Clone & Install
+
 ```bash
+git clone https://github.com/amanullahpy/AI-powered-Idea-Discovery-Validation-platform.git
+cd AI-powered-Idea-Discovery-Validation-platform
 pnpm install
 ```
 
-### 2. Configure environment
-Copy the examples and fill in your Supabase project details:
+### 2. Configure Environment
+
+Copy the example environment file:
+
 ```bash
 cp .env.local.example .env.local
-cp .env.development.local.example .env.development.local
 ```
 
-Required variables:
-```
-SUPABASE_PROJECT_REF=<your-project-ref>
-NEXT_PUBLIC_SUPABASE_URL=<https://<ref>.supabase.co | http://localhost:54321>
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable / anon key>
+Fill in your Supabase project credentials in `.env.local`:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+
+# App URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Optional: Google Gemini API Key for AI Co-pilot
+# If omitted, IdeaForge gracefully falls back to the built-in local idea synthesizer
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-### 3. Provision the database
+> [!TIP]
+> Never commit `.env` or `.env.local` to Git. Ensure secret keys remain strictly local or in your production deployment environment secrets.
 
-**Option A — Local stack (recommended for development):**
+### 3. Run Database Migrations
+
+Apply the migrations to set up the schema, RLS policies, and seed dataset:
+
+**Option A — Hosted Supabase Project:**
+```bash
+pnpm supabase link --project-ref <your-project-ref>
+pnpm supabase db push
+```
+
+**Option B — Local Supabase Stack:**
 ```bash
 pnpm database#start
-pnpm gen-types-local
 ```
 
-**Option B — Hosted Supabase project:**
-```bash
-pnpm supabase link --project-ref $SUPABASE_PROJECT_REF
-pnpm supabase db push
-pnpm gen-types
-```
+Migrations automatically seed:
+1. Complete 15-category taxonomy (`20260903000001_seed_initial_taxonomy.sql`)
+2. Comprehensive sample ideas with MVP blueprints (`20260903000002_seed_sample_ideas.sql`)
 
-### 4. Run the app
+### 4. Run Development Server
+
 ```bash
 pnpm dev
-# → http://localhost:3000
 ```
 
-### 5. Test
-```bash
-pnpm test          # Vitest unit / integration
-pnpm test:e2e      # Playwright end-to-end
-pnpm typecheck     # tsc --noEmit across the monorepo
-pnpm lint          # oxlint
-```
-
-### 6. Deploy
-NextBase deploys to any Node 22+ host. Vercel is the path of least resistance:
-- Set the same env vars as production secrets.
-- Point your custom domain at the deployment.
-- Configure the Supabase project's allowed redirect URLs (`<your-domain>/auth/callback`).
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## React Bits
+## AI Co-Pilot & Synthesizer
 
-The marketing and auth surfaces use animated components from [React Bits](https://reactbits.dev), installed through the shadcn community registry.
+The AI engine (`apps/web/src/lib/ai/provider.ts`) supports two operating modes:
 
-Installed components:
-
-- `BlurText` — blur-to-focus word reveal
-- `ShinyText` — metallic shine sweep
-- `SpotlightCard` — cursor-following radial spotlight
-
-They are used in:
-
-- `apps/web/src/app/(external-pages)/home-hero.tsx`
-- `apps/web/src/app/(external-pages)/home-cta.tsx`
-- `apps/web/src/app/(auth-pages)/login/Login.tsx`
-
-Add more React Bits components with the shadcn CLI:
-
-```bash
-cd apps/web
-pnpm dlx shadcn@latest add @react-bits/<ComponentName>-TS-TW
-```
-
-The registry is already configured in `apps/web/components.json`:
-
-```json
-{
-  "registries": {
-    "@react-bits": "https://reactbits.dev/r/{name}.json"
-  }
-}
-```
+1. **Gemini Pro Integration:** Set `GEMINI_API_KEY` to connect directly to Google Gemini for contextual, multi-turn ideation and dynamic market critique.
+2. **Local Synthesizer Fallback:** If no API key is provided, the platform automatically utilizes an offline heuristic synthesizer that formats prompts into structured MVP specs without external network dependencies or API costs.
 
 ---
 
-## Production features
+## Available Scripts
 
-NextBase Starter is engineered with the assumption that someone is paying you on the other side of the request.
-
-- **Defense in depth.** RLS at the DB, middleware at the edge, `authActionClient` at the action boundary — three independent checks before any mutation reaches user data.
-- **No client-side service role.** The publishable/anon key is the only Supabase credential the client ever sees. Privileged operations belong in server actions.
-- **Type-safe boundaries.** Every server action is Zod-validated. Every query is typed against the generated `database.types.ts`. Drift between schema and code surfaces at build time, not in production.
-- **Idempotent auth callbacks.** `/auth/callback` and `/auth/confirm` tolerate replays, expired codes, and double-submits — with explicit `/auth/auth-code-error` redirection on failure.
-- **Webhook-ready posture.** Server actions, route handlers, and the safe-action middleware stack are structured for adding webhook validation and idempotency keys without re-plumbing the data layer.
-- **Logging hooks.** A development-time logging middleware is wired into `actionClient`; swap it for your observability vendor (Datadog, Sentry, Axiom, Highlight) without touching individual actions.
-- **Reproducible builds.** Pinned `pnpm` version via `packageManager`, pinned Node via `.nvmrc` / `.node-version`, Turbo task caching, and Changesets-driven release PRs.
-- **SEO production-ready.** Sitemap generated on build (`next-sitemap`), Open Graph + JSON-LD helpers via `next-seo`.
-
----
-
-## Target audience
-
-**NextBase Starter is for you if:**
-- You're a founder, indie hacker, or small team shipping a SaaS on Next.js + Supabase and you want to compress weeks of plumbing into a weekend of customization.
-- You're a senior engineer who wants a credible starting point you can audit line-by-line, not a black-box CLI generator.
-- You've already shipped on Supabase and want a reference architecture for RLS, SSR cookies, and Cache Components that you can trust.
-- You're prototyping or building an MVP and want the auth + DB layer working in an hour.
-
-**NextBase Starter is _not_ for you if:**
-- You need a no-code or visual builder.
-- You're learning React or TypeScript for the first time — this codebase assumes professional fluency.
-- You want a non-Supabase stack (Firebase, Clerk + Postgres, etc.). Use a starter built for that combination.
-
-> Looking for Stripe billing, teams/orgs, RBAC admin, transactional email, multi-tenancy, or AI starter kits? Those are first-class in the [premium NextBase kits](https://usenextbase.com) — see [Need more out of the box?](#need-more-out-of-the-box) below.
-
----
-
-## Comparison
-
-| | Build from scratch | **NextBase Starter (this repo)** | [Premium NextBase kits](https://usenextbase.com) |
-|---|---|---|---|
-| License | — | MIT, free | Commercial |
-| Days to first authenticated route | 5–10 | **< 1 hour** | < 1 hour |
-| SSR-correct Supabase auth | Often broken on first try | **Yes** | Yes |
-| RLS-by-default migrations | Rare | **Yes** | Yes |
-| Typed server actions + Zod | Manual | **Yes** | Yes |
-| Cache Components strategy | DIY | **Yes, documented** | Yes, documented |
-| Monorepo with Turbo + Changesets | Weeks of setup | **Yes** | Yes |
-| Stripe billing (subscriptions + webhooks) | DIY | No | **Yes** |
-| Teams & organizations | DIY | No | **Yes** |
-| RBAC + admin panel | DIY | No | **Yes** |
-| Transactional emails (React Email) | DIY | No | **Yes** |
-| Multi-tenancy patterns | DIY | No | **Yes** |
-| AI starter kits (chatbot, RAG, agents) | DIY | No | **Yes (select kits)** |
-
----
-
-## License
-
-NextBase Starter is released under the **MIT License**. You may use, modify, and distribute it freely — commercial use included — subject to the terms in [`LICENSE`](./LICENSE).
-
-The code is provided **as is**, without warranty of any kind. See the [`LICENSE`](./LICENSE) file for the full text.
+| Command | Description |
+|---|---|
+| `pnpm dev` | Start Next.js Turbopack development server |
+| `pnpm build` | Create optimized production build across monorepo |
+| `pnpm test` | Run Vitest unit & integration test suite |
+| `pnpm typecheck` | Run `tsc --noEmit` across all workspace packages |
+| `pnpm lint` | Run `oxlint` fast static analysis |
+| `pnpm gen-types` | Regenerate TypeScript types from remote Supabase schema |
+| `pnpm gen-types-local` | Regenerate TypeScript types from local Supabase container |
 
 ---
 
 ## Contributing
 
-Contributions are welcome — bug reports, fixes, docs, and pattern improvements.
+Contributions, feedback, and feature suggestions are welcome!
 
-- Open an issue or PR on GitHub.
-- If your change is user-visible, add a changeset with `pnpm changeset`. Merged changesets are rolled into an automated "Version Packages" PR and cut a GitHub release when that PR lands on `main`.
-- Run `pnpm lint`, `pnpm typecheck`, and `pnpm test` before submitting.
-
-See [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md) for common setup issues.
-
----
-
-## Roadmap
-
-NextBase Starter is actively maintained. Recent direction and what's next:
-
-- ✅ Migrate to Next.js 16 + Cache Components.
-- ✅ Switch to `oxlint` / `oxfmt` for sub-second lint feedback on large repos.
-- ✅ Changesets-driven release automation with automated "Version Packages" PRs.
-- ✅ Playwright + Vitest scaffolding wired into Turbo pipelines.
-- 🔜 Expanded RLS examples and pgTAP test patterns.
-- 🔜 Documentation refresh covering the full Cache Components mental model end-to-end.
-
-Maintenance promise: the starter tracks Next.js minor releases, Supabase SDK breaking changes, and Node LTS upgrades. The richer feature kits (billing, teams, admin, email, AI) are maintained on the same cadence inside the [premium NextBase kits](https://usenextbase.com).
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to your branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
-## Need more out of the box?
+## License
 
-This starter is the open-source foundation. The [premium NextBase kits](https://usenextbase.com) ship everything a real SaaS needs on top of it — same architectural DNA, same patterns, dramatically more shipped.
+IdeaForge is distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for full details.
 
-### SaaS essentials
-- **Stripe billing.** Subscriptions, one-time payments, customer portal, usage-based metering, and webhook handling — implemented, idempotent, and tested.
-- **Teams & organizations.** Org creation, invitations, role assignment, team-scoped data, and team-aware RLS policies.
-- **RBAC & admin panel.** Role-based permissions and an admin dashboard for managing users, orgs, and subscriptions.
-- **Transactional emails.** React Email templates for auth, billing, and invitation flows, wired to providers like Resend or Postmark.
-- **Multi-tenancy patterns.** Schema- and row-level tenant isolation documented and enforced via RLS.
-- **Audit logs.** Append-only audit trails for sensitive actions, ready to wire into your admin views.
-- **Profiles, onboarding & settings UI.** Production-grade user/profile management screens you'd otherwise build twice.
-- **Internationalization (i18n) variants.** App Router-native localization with translated routes and content.
-- **Enterprise-grade features.** SSO-friendly auth patterns, role hierarchies, and tooling for teams operating at scale.
-
-
-### Database & stack variants
-- **Drizzle, Prisma, and PlanetScale variants** — for teams that prefer code-first schemas or MySQL/Vitess infrastructure alongside (or instead of) Supabase.
-
-### AI & specialized kits
-- **AI chatbot kit** — conversation UI, streaming responses, message history.
-- **Vision / image kit** — image understanding and generation flows.
-- **Speech-to-text kit** — transcription pipelines wired to Whisper-class models.
-- **Video generator kit** — pipelines for generative video.
-- **Headshot generator kit** — fine-tune and generate user-personalized images.
-- **Browser agent kit** — agentic web browsing and automation.
-- **Note-taker kit** — capture, structure, and search long-form notes.
-- **Workflow orchestrator kit** — multi-step agent and workflow runner.
-- **Shopify / e-commerce variant** — storefront and product flows on the same architecture.
-
-These are not separate codebases you have to context-switch into — they share this starter's conventions for server actions, RLS, Cache Components, and the monorepo layout. The mental model transfers directly.
-
-**[→ Explore the premium NextBase kits at usenextbase.com](https://usenextbase.com)**
-
----
-
-## FAQ
-
-**Q: Is this really free?**
-A: Yes. The starter is MIT-licensed. Use it for personal projects, client work, internal tools, or commercial products. No purchase required.
-
-**Q: What's the difference between this and the premium kits?**
-A: This starter covers the foundation — Supabase auth, RLS, server actions, Cache Components, monorepo, tests. The [premium kits](https://usenextbase.com) add the features SaaS products actually need on top: Stripe billing, teams, RBAC + admin, transactional emails, multi-tenancy, and AI starters.
-
-**Q: Can I use the starter for client work?**
-A: Yes — MIT permits commercial and client use. Attribution is appreciated but not required.
-
-**Q: Why Supabase instead of Clerk + Postgres / Auth.js / Firebase?**
-A: Supabase gives you Auth, Postgres, RLS, and Storage from one vendor with a real SQL surface, real migrations, and real RLS — without the ergonomics tax of stitching three SDKs together. NextBase is opinionated about that choice.
-
-**Q: Does it support edge runtime?**
-A: The middleware is edge-compatible. Server actions and RSCs run on the Node runtime by default, which is the right choice for Supabase SSR cookies and most app logic.
-
-**Q: Can I rip out shadcn / Tailwind / TanStack Query?**
-A: Yes, it's your codebase. Replace what you don't want — the architecture doesn't depend on any one of them.
-
-**Q: Will it scale?**
-A: The architecture — Postgres + RLS + Next.js + Vercel/Node — runs production SaaS at well into seven-figure ARR. The bottleneck is rarely the boilerplate; it's the schema and query patterns you build on top, which is exactly what NextBase makes explicit.
-
-**Q: How do I report a bug or ask a question?**
-A: Open a GitHub issue with a reproducible scenario. PRs welcome.
-
----
-
-## Final CTA
-
-Clone the starter, ship your MVP, and come back for the premium kits when you need real billing, teams, or admin tooling.
-
-**[→ Clone the starter](#quick-start)** &nbsp;·&nbsp; **[Explore premium NextBase kits](https://usenextbase.com)** &nbsp;·&nbsp; **[Read the docs](./docs)**
+<div align="center">
+  <sub>Crafted with passion for builders, creators, and founders worldwide.</sub>
+</div>

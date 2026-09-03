@@ -8,12 +8,8 @@ import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { siteConfig } from '@/config/site';
 
 export function HomeHero() {
   return (
@@ -23,7 +19,7 @@ export function HomeHero() {
         <div className="max-w-2xl space-y-7">
           <Badge variant="secondary" className="gap-1.5 rounded-full px-3 py-1">
             <Sparkles className="size-3.5 text-primary" aria-hidden="true" />
-            AI-Powered Idea Discovery & Validation
+            {siteConfig.tagline}
           </Badge>
           <div className="space-y-5">
             <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">

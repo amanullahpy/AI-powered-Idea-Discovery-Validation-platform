@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,26 +22,41 @@ import {
   Users,
 } from 'lucide-react';
 import { toggleSaveIdeaAction } from '@/data/ideas/actions';
+import { createClient } from '@/supabase-clients/client';
 import { toast } from 'sonner';
 
 interface PublicIdeaViewProps {
   idea: any;
-  isAuthenticated: boolean;
-  isSavedInitial: boolean;
+  isAuthenticated?: boolean;
+  isSavedInitial?: boolean;
 }
 
 export function PublicIdeaView({
   idea,
-  isAuthenticated,
-  isSavedInitial,
+  isAuthenticated = false,
+  isSavedInitial = false,
 }: PublicIdeaViewProps) {
   const [isSaved, setIsSaved] = useState(isSavedInitial);
+  const [isAuth, setIsAuth] = useState(isAuthenticated);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    try {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data }) => {
+        if (data?.user) {
+          setIsAuth(true);
+        }
+      });
+    } catch {
+      // offline / uninitialized
+    }
+  }, []);
 
   const mvpFeatures: string[] = Array.isArray(idea.mvp_features) ? idea.mvp_features : [];
 
   function handleSave() {
-    if (!isAuthenticated) {
+    if (!isAuth) {
       toast.info('Please sign in or create an account to save ideas to your workspace.');
       return;
     }

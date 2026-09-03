@@ -1,10 +1,11 @@
 import { getCachedLoggedInUserId } from '@/rsc-data/supabase';
 import { AIChat } from './ai-chat';
 import { redirect } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 export const metadata = {
-  title: 'AI Idea Co-pilot — Idea Discovery Platform',
-  description: 'Brainstorm, generate, and refine high-conviction ideas with your interactive AI venture co-pilot.',
+  title: `AI Idea Co-pilot — ${siteConfig.name}`,
+  description: `Brainstorm, generate, and refine high-conviction ideas with your interactive ${siteConfig.name} AI co-pilot.`,
 };
 
 export default async function AIPage() {

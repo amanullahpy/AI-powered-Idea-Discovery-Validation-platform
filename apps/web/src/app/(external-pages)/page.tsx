@@ -1,39 +1,52 @@
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, Database, Lock, Palette, Shield, Zap } from 'lucide-react';
+import {
+  BookmarkCheck,
+  CheckCircle2,
+  Code2,
+  Compass,
+  Sliders,
+  Sparkles,
+} from 'lucide-react';
 import { HomeCTA } from './home-cta';
 import { HomeFeatures, type HomeFeature } from './home-features';
 import { HomeHero } from './home-hero';
 
 const features: HomeFeature[] = [
   {
-    icon: Shield,
-    title: 'Type-Safe',
-    description: 'End-to-end TypeScript with auto-generated Supabase types. Catch errors at compile time.',
+    icon: Compass,
+    title: '15+ Idea Categories',
+    description:
+      'Explore database-backed opportunities spanning Micro-SaaS, AI Agents, Developer Tools, Mobile Apps, FYPs, and Side Hustles.',
   },
   {
-    icon: Zap,
-    title: 'Modern Stack',
-    description: 'Next.js 16, TypeScript, Supabase, and Tailwind CSS — the best tools for modern web development.',
+    icon: Sliders,
+    title: 'Personalized Match Engine',
+    description:
+      'Match scores dynamically rank concepts according to your programming skills, available hours, capital budget, and timeline.',
   },
   {
-    icon: Palette,
-    title: 'UI Components',
-    description: 'Beautiful components built with Radix UI and Tailwind. Accessible and customizable.',
+    icon: Sparkles,
+    title: 'AI Idea Co-pilot',
+    description:
+      'Brainstorm in real-time with an AI co-pilot. Refine monetization models, pivot angles, and reduce scope down to rapid MVPs.',
   },
   {
-    icon: Lock,
-    title: 'Authentication',
-    description: 'Magic links, OAuth providers, and email/password with protected routes — all pre-configured.',
+    icon: CheckCircle2,
+    title: 'Validation & Moat Audits',
+    description:
+      'Audit market demand, pinpoint competitor weaknesses, check unit economics, and test hypotheses before building.',
   },
   {
-    icon: Database,
-    title: 'Database Ready',
-    description: 'Supabase with Row Level Security, migrations, and seed data — ready for production.',
+    icon: Code2,
+    title: 'Actionable MVP Blueprints',
+    description:
+      'Detailed launch specifications with proposed tech stacks, core features, ideal customer profiles, and pricing tiers.',
   },
   {
-    icon: ArrowRight,
-    title: 'Fast Deployment',
-    description: 'Deploy to Vercel in minutes. CI/CD, preview deployments, and automatic type generation included.',
+    icon: BookmarkCheck,
+    title: 'Private Idea Cockpit',
+    description:
+      'Organize your favorites, track validation progress, take notes, and compare concepts side-by-side with full RLS privacy.',
   },
 ];
 

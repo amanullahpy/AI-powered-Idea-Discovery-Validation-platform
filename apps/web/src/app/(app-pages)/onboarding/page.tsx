@@ -2,10 +2,11 @@ import { getCachedLoggedInUserId } from '@/rsc-data/supabase';
 import { getTaxonomyOptions, getUserOnboardingData } from '@/data/user/onboarding';
 import { OnboardingWizard } from './onboarding-wizard';
 import { redirect } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 export const metadata = {
-  title: 'Personalize Your Idea Discovery — NextBase',
-  description: 'Tell us about your interests, skills, and goals to discover tailored startup and project ideas.',
+  title: `Personalize Your Idea Discovery — ${siteConfig.name}`,
+  description: `Tell us about your interests, skills, and goals to discover tailored startup and project ideas on ${siteConfig.name}.`,
 };
 
 export default async function OnboardingPage() {

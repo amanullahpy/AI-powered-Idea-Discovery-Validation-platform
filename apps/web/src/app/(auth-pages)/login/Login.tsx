@@ -13,6 +13,7 @@ import { EmailConfirmationPendingCard } from '@/components/Auth/EmailConfirmatio
 import { RedirectingPleaseWaitCard } from '@/components/Auth/RedirectingPleaseWaitCard';
 import { RenderProviders } from '@/components/Auth/RenderProviders';
 import { Button } from '@/components/ui/button';
+import { siteConfig } from '@/config/site';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   signInWithMagicLinkAction,
@@ -116,11 +117,11 @@ export function Login({ next }: { next?: string }) {
 
   return (
     <AuthCard
-      title="Login to NextBase"
+      title={`Sign in to ${siteConfig.name}`}
       description="Choose the sign-in method that works best for you."
       footer={
         <p className="w-full text-center text-sm text-muted-foreground">
-          New to Nextbase?{' '}
+          New to {siteConfig.name}?{' '}
           <Button variant="link" className="h-auto px-0" asChild>
             <Link href="/sign-up">Create an account</Link>
           </Button>

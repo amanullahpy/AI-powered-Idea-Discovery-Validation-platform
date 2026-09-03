@@ -6,8 +6,8 @@ export const createSupabaseClient = async () => {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -19,11 +19,27 @@ export const createSupabaseClient = async () => {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Ignored from Server Components
           }
         },
+      },
+    }
+  );
+};
+
+/**
+ * Static client without cookies for build-time operations and static generation
+ */
+export const createStaticSupabaseClient = () => {
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321',
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'dummy-key',
+    {
+      cookies: {
+        getAll() {
+          return [];
+        },
+        setAll() {},
       },
     }
   );

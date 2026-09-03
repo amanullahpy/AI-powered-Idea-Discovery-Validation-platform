@@ -1,4 +1,4 @@
-import { ArrowRight, Rocket } from 'lucide-react';
+import { ArrowRight, Compass } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -16,18 +16,17 @@ export function AboutCTA() {
     <Empty className="border bg-muted/20 py-12">
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <Rocket aria-hidden="true" />
+          <Compass aria-hidden="true" />
         </EmptyMedia>
-        <EmptyTitle>Ready to build something useful?</EmptyTitle>
+        <EmptyTitle>Ready to validate your next project?</EmptyTitle>
         <EmptyDescription>
-          Start with the working example, then replace the demo feature with
-          the product only you can build.
+          Explore hundreds of curated concepts or generate a tailored idea with your AI co-pilot today.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <Button size="lg" asChild>
           <Link href="/sign-up">
-            Create your account
+            Create Free Account
             <ArrowRight aria-hidden="true" />
           </Link>
         </Button>

@@ -9,13 +9,13 @@ export const siteConfig = {
   // Brand Identity
   name: 'IdeaForge',
   shortName: 'IdeaForge',
-  tagline: 'AI Idea Discovery & Validation',
+  tagline: 'AI-Powered Idea Discovery & Validation',
   description:
-    'An AI-powered discovery and validation platform to explore profitable SaaS, startup, mobile, and side hustle concepts tailored to your skills, budget, and timeline.',
+    'Discover high-conviction startup, SaaS, AI agent, and side hustle concepts tailored to your skills, budget, and timeline. Validate market demand, audit competitors, and build your MVP faster.',
 
   // Domain & URLs
   url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  ogImage: '/og-image.png',
+  ogImage: '/logos/ideaforge-logo.svg',
 
   // Author & Contact
   author: 'IdeaForge Team',
@@ -24,7 +24,7 @@ export const siteConfig = {
 
   // Social & Community Links
   links: {
-    github: 'https://github.com/imbhargav5/nextbase-nextjs-supabase-starter',
+    github: 'https://github.com/amanullahpy/AI-powered-Idea-Discovery-Validation-platform',
     twitter: 'https://twitter.com',
     discord: 'https://discord.gg',
   },
@@ -32,7 +32,7 @@ export const siteConfig = {
   // Main Public Navigation Menu
   navigation: [
     { href: '/', label: 'Home' },
-    { href: '/discover', label: 'Discover' },
+    { href: '/discover', label: 'Discover Ideas' },
     { href: '/ai', label: 'AI Co-pilot' },
     { href: '/about', label: 'About' },
   ],
@@ -41,7 +41,7 @@ export const siteConfig = {
   footer: {
     tagline: 'Discover, validate, and launch your next high-conviction idea.',
     copyright: `© ${new Date().getFullYear()} IdeaForge. All rights reserved.`,
-    badge: 'Next.js 16 · Supabase · shadcn/ui',
+    badge: 'Powered by Next.js 16 · Supabase · AI Co-pilot',
   },
 
   // Feature Flags

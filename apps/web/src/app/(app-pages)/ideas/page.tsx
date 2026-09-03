@@ -2,10 +2,11 @@ import { getCachedLoggedInUserId } from '@/rsc-data/supabase';
 import { getUserIdeas, getSavedIdeas } from '@/data/ideas/actions';
 import { IdeasWorkspace } from './ideas-workspace';
 import { redirect } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 export const metadata = {
-  title: 'My Ideas — Idea Discovery Platform',
-  description: 'Manage, organize, and develop your saved and generated ideas.',
+  title: `My Ideas — ${siteConfig.name}`,
+  description: `Manage, organize, and develop your saved and generated ideas on ${siteConfig.name}.`,
 };
 
 export default async function IdeasPage() {

@@ -1,7 +1,10 @@
 import '@/styles/globals.css';
 import localFont from 'next/font/local';
+import type { Metadata } from 'next';
 import { DynamicLayoutProviders } from './DynamicLayoutProviders';
 import { ClientLayout } from './ClientLayout';
+import { siteConfig } from '@/config/site';
+import { JsonLd, getWebsiteJsonLd } from '@/lib/seo/json-ld';
 
 const inter = localFont({
   src: [
@@ -23,14 +26,75 @@ const robotoMono = localFont({
   display: 'swap',
 });
 
-import { siteConfig } from '@/config/site';
-
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: `${siteConfig.name} — ${siteConfig.tagline}`,
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
+  authors: [{ name: siteConfig.author, url: siteConfig.url }],
+  creator: siteConfig.creator,
+  publisher: siteConfig.name,
+  category: 'business & technology',
+  keywords: [
+    'AI startup ideas',
+    'idea validation',
+    'SaaS opportunities',
+    'micro-saas',
+    'AI agents',
+    'business idea discovery',
+    'indie hackers',
+    'startup MVP blueprints',
+    'founder validation checklists',
+    'market research co-pilot',
+  ],
+  alternates: {
+    canonical: siteConfig.url,
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    locale: 'en_US',
+    images: [
+      {
+        url: `${siteConfig.url}${siteConfig.ogImage}`,
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} Logo & Platform Preview`,
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    images: [`${siteConfig.url}${siteConfig.ogImage}`],
+    creator: '@ideaforge',
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -41,7 +105,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-scroll-behavior="smooth"
       className={`${inter.variable} ${robotoMono.variable}`}
     >
-      <head />
+      <head>
+        <JsonLd data={getWebsiteJsonLd()} />
+      </head>
       <body>
         <DynamicLayoutProviders>
           <ClientLayout>

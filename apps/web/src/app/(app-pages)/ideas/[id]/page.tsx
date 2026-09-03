@@ -2,6 +2,7 @@ import { getCachedLoggedInUserId } from '@/rsc-data/supabase';
 import { getIdeaById } from '@/data/ideas/actions';
 import { IdeaCockpit } from './idea-cockpit';
 import { notFound, redirect } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 interface IdeaDetailPageProps {
   params: Promise<{ id: string }>;
@@ -11,10 +12,10 @@ export async function generateMetadata({ params }: IdeaDetailPageProps) {
   const { id } = await params;
   const idea = await getIdeaById(id);
   if (!idea) {
-    return { title: 'Idea Not Found' };
+    return { title: `Idea Not Found — ${siteConfig.name}` };
   }
   return {
-    title: `${idea.title} — Idea Cockpit`,
+    title: `${idea.title} — ${siteConfig.name}`,
     description: idea.short_description,
   };
 }

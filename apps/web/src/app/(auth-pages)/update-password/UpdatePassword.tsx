@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { AuthCard } from '@/components/Auth/AuthCard';
 import { Password } from '@/components/Auth/Password';
 import { updatePasswordAction } from '@/data/user/security';
+import { siteConfig } from '@/config/site';
 
 export function UpdatePassword() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export function UpdatePassword() {
   return (
     <AuthCard
       title="Create a new password"
-      description="Choose a secure password for your Nextbase account."
+      description={`Choose a secure password for your ${siteConfig.name} account.`}
       icon={<ShieldCheck aria-hidden="true" />}
     >
       <Password

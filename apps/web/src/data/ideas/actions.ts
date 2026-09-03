@@ -1,7 +1,7 @@
 'use server';
 
 import { authActionClient } from '@/lib/safe-action';
-import { createSupabaseClient } from '@/supabase-clients/server';
+import { createSupabaseClient, createStaticSupabaseClient } from '@/supabase-clients/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import {
@@ -76,19 +76,24 @@ export async function getIdeaById(id: string, currentUserId?: string) {
 }
 
 export async function getIdeaBySlug(slug: string) {
-  const supabase = await createSupabaseClient();
-  const { data, error } = await supabase
-    .from('ideas')
-    .select('*, categories(name, slug, icon)')
-    .eq('slug', slug)
-    .is('deleted_at', null)
-    .maybeSingle();
+  try {
+    const supabase = createStaticSupabaseClient();
+    const { data, error } = await supabase
+      .from('ideas')
+      .select('*, categories(name, slug, icon)')
+      .eq('slug', slug)
+      .is('deleted_at', null)
+      .maybeSingle();
 
-  if (error || !data) {
-    const fallback = FALLBACK_SAMPLE_IDEAS.find((i) => i.slug === slug);
-    return fallback || null;
+    if (data && !error) {
+      return data;
+    }
+  } catch {
+    // fallback
   }
-  return data;
+
+  const fallback = FALLBACK_SAMPLE_IDEAS.find((i) => i.slug === slug);
+  return fallback || null;
 }
 
 const FALLBACK_SAMPLE_IDEAS: any[] = [
@@ -208,21 +213,32 @@ const FALLBACK_SAMPLE_IDEAS: any[] = [
   },
 ];
 
+export async function getStaticIdeaSlugs() {
+  return FALLBACK_SAMPLE_IDEAS.map((idea) => ({ slug: idea.slug }));
+}
+
 export async function getPublicIdeas(filters?: { categorySlug?: string; difficulty?: string; search?: string }) {
-  const supabase = await createSupabaseClient();
-  let query = supabase
-    .from('ideas')
-    .select('*, categories(name, slug, icon)')
-    .eq('visibility', 'PUBLIC')
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false });
+  let results: any[] = [];
+  try {
+    const supabase = createStaticSupabaseClient();
+    let query = supabase
+      .from('ideas')
+      .select('*, categories(name, slug, icon)')
+      .eq('visibility', 'PUBLIC')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false });
 
-  if (filters?.difficulty) {
-    query = query.eq('difficulty', filters.difficulty as any);
+    if (filters?.difficulty) {
+      query = query.eq('difficulty', filters.difficulty as any);
+    }
+
+    const { data } = await query;
+    if (data && data.length > 0) {
+      results = data;
+    }
+  } catch {
+    // fallback
   }
-
-  const { data } = await query;
-  let results: any[] = data || [];
 
   if (results.length === 0) {
     results = [...FALLBACK_SAMPLE_IDEAS];

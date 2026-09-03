@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Bookmark, Compass } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 export const metadata = {
-  title: 'Saved Ideas — Idea Platform',
-  description: 'Your bookmarked ideas and inspirations.',
+  title: `Saved Ideas — ${siteConfig.name}`,
+  description: `Your bookmarked ideas and inspirations on ${siteConfig.name}.`,
 };
 
 export default async function SavedIdeasPage() {

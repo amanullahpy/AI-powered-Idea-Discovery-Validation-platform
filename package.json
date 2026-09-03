@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "pnpm --filter web dev",
     "web#dev": "pnpm --filter web dev",
-    "build": "turbo run build",
+    "build": "pnpm --filter web build",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",

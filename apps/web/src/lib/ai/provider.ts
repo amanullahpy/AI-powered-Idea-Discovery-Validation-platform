@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { siteConfig } from '@/config/site';
 
 export const structuredIdeaSchema = z.object({
   title: z.string().min(3).max(120),
@@ -238,7 +239,7 @@ User Background: ${JSON.stringify(userContext || {})}`,
   return {
     idea,
     model: 'idea-synthesizer-v1',
-    provider: 'NextBase AI Engine',
+    provider: `${siteConfig.name} AI Engine`,
     inputTokens: prompt.length / 4,
     outputTokens: 350,
     latencyMs: Date.now() - startTime,
@@ -290,7 +291,7 @@ You can review the full blueprint, MVP scope, and financial estimates in the car
     reply: replyText,
     suggestedIdea,
     model: 'idea-copilot-v1',
-    provider: 'NextBase AI Co-pilot',
+    provider: `${siteConfig.name} AI Co-pilot`,
     inputTokens: 150,
     outputTokens: 250,
     latencyMs: Date.now() - startTime,

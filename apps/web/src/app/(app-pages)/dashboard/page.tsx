@@ -5,10 +5,11 @@ import { getUserIdeas, getSavedIdeas, getPublicIdeas } from '@/data/ideas/action
 import { calculateIdeaMatchScore } from '@/lib/recommendations/matcher';
 import { DashboardView } from './dashboard-view';
 import { redirect } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 export const metadata = {
-  title: 'Dashboard — Idea Platform',
-  description: 'Your personalized ideas, AI tools, and project opportunities.',
+  title: `Dashboard — ${siteConfig.name}`,
+  description: `Your personalized ideas, AI tools, and project opportunities on ${siteConfig.name}.`,
 };
 
 export default async function DashboardPage() {

@@ -3,10 +3,11 @@ import { getTaxonomyOptions, getUserOnboardingData } from '@/data/user/onboardin
 import { getUserProfile } from '@/data/user/profile';
 import { SettingsEditor } from './settings-editor';
 import { redirect } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 export const metadata = {
-  title: 'Settings — Idea Platform',
-  description: 'Manage your profile and idea discovery preferences.',
+  title: `Settings — ${siteConfig.name}`,
+  description: `Manage your profile and idea discovery preferences on ${siteConfig.name}.`,
 };
 
 export default async function SettingsPage() {

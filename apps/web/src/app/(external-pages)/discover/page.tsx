@@ -3,10 +3,33 @@ import { getTaxonomyOptions, getUserOnboardingData } from '@/data/user/onboardin
 import { getPublicIdeas, getSavedIdeas } from '@/data/ideas/actions';
 import { calculateIdeaMatchScore } from '@/lib/recommendations/matcher';
 import { DiscoverView } from './discover-view';
+import { siteConfig } from '@/config/site';
+import { JsonLd, getBreadcrumbJsonLd } from '@/lib/seo/json-ld';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Discover Ideas — Idea Platform',
-  description: 'Explore curated, public startup, SaaS, mobile, and side hustle concepts.',
+export const instant = false;
+
+export const metadata: Metadata = {
+  title: `Discover Ideas — ${siteConfig.name}`,
+  description: `Explore curated, public startup, SaaS, mobile, AI agent, and side hustle concepts on ${siteConfig.name}. Filter by skill level, category, and budget.`,
+  keywords: [
+    'discover startup ideas',
+    'browse SaaS opportunities',
+    'AI agent blueprints',
+    'profitable side hustles',
+    'indie hacker ideas',
+    'MVP concepts',
+  ],
+  alternates: {
+    canonical: `${siteConfig.url}/discover`,
+  },
+  openGraph: {
+    title: `Discover High-Conviction Startup & SaaS Ideas — ${siteConfig.name}`,
+    description: `Explore curated, public startup, SaaS, mobile, AI agent, and side hustle concepts on ${siteConfig.name}.`,
+    url: `${siteConfig.url}/discover`,
+    siteName: siteConfig.name,
+    type: 'website',
+  },
 };
 
 export default async function DiscoverPage() {
@@ -49,12 +72,38 @@ export default async function DiscoverPage() {
     };
   });
 
+  const collectionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `Discover Ideas — ${siteConfig.name}`,
+    description: `Explore curated startup and project ideas across ${taxonomy.categories.length}+ categories.`,
+    url: `${siteConfig.url}/discover`,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: scoredIdeas.slice(0, 10).map((idea: any, index: number) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: idea.title,
+        url: `${siteConfig.url}/ideas/public/${idea.slug}`,
+      })),
+    },
+  };
+
+  const breadcrumbItems = [
+    { name: 'Home', url: '/' },
+    { name: 'Discover Ideas', url: '/discover' },
+  ];
+
   return (
-    <DiscoverView
-      categories={taxonomy.categories}
-      initialIdeas={scoredIdeas}
-      savedIdeaIds={savedIdeaIds}
-      currentUserId={currentUserId}
-    />
+    <>
+      <JsonLd data={collectionJsonLd} />
+      <JsonLd data={getBreadcrumbJsonLd(breadcrumbItems)} />
+      <DiscoverView
+        categories={taxonomy.categories}
+        initialIdeas={scoredIdeas}
+        savedIdeaIds={savedIdeaIds}
+        currentUserId={currentUserId}
+      />
+    </>
   );
 }

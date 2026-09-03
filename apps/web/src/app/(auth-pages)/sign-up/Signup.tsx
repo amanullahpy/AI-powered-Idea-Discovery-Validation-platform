@@ -11,6 +11,7 @@ import { EmailAndPassword } from '@/components/Auth/EmailAndPassword';
 import { EmailConfirmationPendingCard } from '@/components/Auth/EmailConfirmationPendingCard';
 import { RenderProviders } from '@/components/Auth/RenderProviders';
 import { Button } from '@/components/ui/button';
+import { siteConfig } from '@/config/site';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   signInWithMagicLinkAction,
@@ -102,8 +103,8 @@ export function SignUp({ next }: SignUpProps) {
 
   return (
     <AuthCard
-      title="Register to NextBase"
-      description="Create your account and start with a secure, working foundation."
+      title={`Create your ${siteConfig.name} account`}
+      description="Start discovering, validating, and launching profitable ideas."
       footer={
         <p className="w-full text-center text-sm text-muted-foreground">
           Already have an account?{' '}
