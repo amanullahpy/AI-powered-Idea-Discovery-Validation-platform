@@ -1,3 +1,4 @@
+import { getSafeRedirectUrl } from '@/utils/helpers';
 import { createServerClient } from '@supabase/ssr';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
@@ -36,12 +37,6 @@ export async function GET(request: Request) {
 
   revalidatePath('/', 'layout');
 
-  let redirectTo = new URL('/dashboard', requestUrl.origin);
-
-  if (next) {
-    const decodedNext = decodeURIComponent(next);
-    redirectTo = new URL(decodedNext, requestUrl.origin);
-  }
-
+  const redirectTo = getSafeRedirectUrl(next, requestUrl.origin, '/dashboard');
   return NextResponse.redirect(redirectTo);
 }

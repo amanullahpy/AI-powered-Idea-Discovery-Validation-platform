@@ -7,477 +7,37 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      categories: {
-        Row: {
-          id: string
-          parent_id: string | null
-          name: string
-          slug: string
-          description: string | null
-          icon: string | null
-          sort_order: number
-          is_active: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          parent_id?: string | null
-          name: string
-          slug: string
-          description?: string | null
-          icon?: string | null
-          sort_order?: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          parent_id?: string | null
-          name?: string
-          slug?: string
-          description?: string | null
-          icon?: string | null
-          sort_order?: number
-          is_active?: boolean
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "categories_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      skills: {
-        Row: {
-          id: string
-          category: string
-          name: string
-          slug: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          category: string
-          name: string
-          slug: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          category?: string
-          name?: string
-          slug?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      goals: {
-        Row: {
-          id: string
-          title: string
-          description: string | null
-          slug: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          title: string
-          description?: string | null
-          slug: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          title?: string
-          description?: string | null
-          slug?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      markets: {
-        Row: {
-          id: string
-          name: string
-          code: string
-          region: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          code: string
-          region?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          code?: string
-          region?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          id: string
-          username: string | null
-          display_name: string | null
-          avatar_url: string | null
-          bio: string | null
-          onboarding_completed: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          username?: string | null
-          display_name?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          onboarding_completed?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          username?: string | null
-          display_name?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          onboarding_completed?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      user_preferences: {
-        Row: {
-          id: string
-          user_id: string
-          experience_level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT' | null
-          available_time: 'LESS_THAN_1_HR' | '1_TO_2_HRS' | '2_TO_4_HRS' | '4_TO_8_HRS' | 'FULL_TIME' | null
-          budget_bracket: 'ZERO' | '1_TO_50' | '50_TO_250' | '250_TO_1000' | '1000_PLUS' | 'NOT_SURE' | null
-          target_audience_focus: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          experience_level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT' | null
-          available_time?: 'LESS_THAN_1_HR' | '1_TO_2_HRS' | '2_TO_4_HRS' | '4_TO_8_HRS' | 'FULL_TIME' | null
-          budget_bracket?: 'ZERO' | '1_TO_50' | '50_TO_250' | '250_TO_1000' | '1000_PLUS' | 'NOT_SURE' | null
-          target_audience_focus?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          experience_level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT' | null
-          available_time?: 'LESS_THAN_1_HR' | '1_TO_2_HRS' | '2_TO_4_HRS' | '4_TO_8_HRS' | 'FULL_TIME' | null
-          budget_bracket?: 'ZERO' | '1_TO_50' | '50_TO_250' | '250_TO_1000' | '1000_PLUS' | 'NOT_SURE' | null
-          target_audience_focus?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_preferences_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      user_skills: {
-        Row: {
-          user_id: string
-          skill_id: string
-        }
-        Insert: {
-          user_id: string
-          skill_id: string
-        }
-        Update: {
-          user_id?: string
-          skill_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_skills_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_skills_skill_id_fkey"
-            columns: ["skill_id"]
-            isOneToOne: false
-            referencedRelation: "skills"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      user_interests: {
-        Row: {
-          user_id: string
-          category_id: string
-        }
-        Insert: {
-          user_id: string
-          category_id: string
-        }
-        Update: {
-          user_id?: string
-          category_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_interests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_interests_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      user_goals: {
-        Row: {
-          user_id: string
-          goal_id: string
-        }
-        Insert: {
-          user_id: string
-          goal_id: string
-        }
-        Update: {
-          user_id?: string
-          goal_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_goals_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_goals_goal_id_fkey"
-            columns: ["goal_id"]
-            isOneToOne: false
-            referencedRelation: "goals"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      user_markets: {
-        Row: {
-          user_id: string
-          market_id: string
-        }
-        Insert: {
-          user_id: string
-          market_id: string
-        }
-        Update: {
-          user_id?: string
-          market_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_markets_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_markets_market_id_fkey"
-            columns: ["market_id"]
-            isOneToOne: false
-            referencedRelation: "markets"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      ideas: {
-        Row: {
-          id: string
-          owner_id: string | null
-          title: string
-          slug: string
-          short_description: string
-          description: string | null
-          problem: string | null
-          solution: string | null
-          target_audience: string | null
-          monetization: string | null
-          category_id: string | null
-          difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'HARD'
-          estimated_cost: string | null
-          estimated_time: string | null
-          mvp_features: Json
-          visibility: 'PRIVATE' | 'PUBLIC' | 'UNLISTED'
-          status: 'DRAFT' | 'SAVED' | 'VALIDATING' | 'BUILDING' | 'LAUNCHED' | 'ARCHIVED'
-          ai_generated: boolean
-          ai_model: string | null
-          ai_generation_id: string | null
-          deleted_at: string | null
-          created_at: string
-          updated_at: string
-          published_at: string | null
-        }
-        Insert: {
-          id?: string
-          owner_id?: string | null
-          title: string
-          slug: string
-          short_description: string
-          description?: string | null
-          problem?: string | null
-          solution?: string | null
-          target_audience?: string | null
-          monetization?: string | null
-          category_id?: string | null
-          difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'HARD'
-          estimated_cost?: string | null
-          estimated_time?: string | null
-          mvp_features?: Json
-          visibility?: 'PRIVATE' | 'PUBLIC' | 'UNLISTED'
-          status?: 'DRAFT' | 'SAVED' | 'VALIDATING' | 'BUILDING' | 'LAUNCHED' | 'ARCHIVED'
-          ai_generated?: boolean
-          ai_model?: string | null
-          ai_generation_id?: string | null
-          deleted_at?: string | null
-          created_at?: string
-          updated_at?: string
-          published_at?: string | null
-        }
-        Update: {
-          id?: string
-          owner_id?: string | null
-          title?: string
-          slug?: string
-          short_description?: string
-          description?: string | null
-          problem?: string | null
-          solution?: string | null
-          target_audience?: string | null
-          monetization?: string | null
-          category_id?: string | null
-          difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'HARD'
-          estimated_cost?: string | null
-          estimated_time?: string | null
-          mvp_features?: Json
-          visibility?: 'PRIVATE' | 'PUBLIC' | 'UNLISTED'
-          status?: 'DRAFT' | 'SAVED' | 'VALIDATING' | 'BUILDING' | 'LAUNCHED' | 'ARCHIVED'
-          ai_generated?: boolean
-          ai_model?: string | null
-          ai_generation_id?: string | null
-          deleted_at?: string | null
-          created_at?: string
-          updated_at?: string
-          published_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ideas_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ideas_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      saved_ideas: {
-        Row: {
-          id: string
-          user_id: string
-          idea_id: string
-          notes: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          idea_id: string
-          notes?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          idea_id?: string
-          notes?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "saved_ideas_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "saved_ideas_idea_id_fkey"
-            columns: ["idea_id"]
-            isOneToOne: false
-            referencedRelation: "ideas"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       ai_conversations: {
         Row: {
-          id: string
-          user_id: string
-          title: string
-          context_type: 'GENERATION' | 'REFINEMENT' | 'VALIDATION'
+          context_type: string
           created_at: string
+          id: string
+          title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          title?: string
-          context_type?: 'GENERATION' | 'REFINEMENT' | 'VALIDATION'
+          context_type?: string
           created_at?: string
+          id?: string
+          title?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          title?: string
-          context_type?: 'GENERATION' | 'REFINEMENT' | 'VALIDATION'
+          context_type?: string
           created_at?: string
+          id?: string
+          title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -486,42 +46,42 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       ai_messages: {
         Row: {
-          id: string
-          conversation_id: string
-          role: 'user' | 'assistant' | 'system'
           content: string
-          metadata: Json
-          input_tokens: number
-          output_tokens: number
-          latency_ms: number
+          conversation_id: string
           created_at: string
+          id: string
+          input_tokens: number | null
+          latency_ms: number | null
+          metadata: Json
+          output_tokens: number | null
+          role: string
         }
         Insert: {
-          id?: string
-          conversation_id: string
-          role: 'user' | 'assistant' | 'system'
           content: string
-          metadata?: Json
-          input_tokens?: number
-          output_tokens?: number
-          latency_ms?: number
+          conversation_id: string
           created_at?: string
+          id?: string
+          input_tokens?: number | null
+          latency_ms?: number | null
+          metadata?: Json
+          output_tokens?: number | null
+          role: string
         }
         Update: {
-          id?: string
-          conversation_id?: string
-          role?: 'user' | 'assistant' | 'system'
           content?: string
-          metadata?: Json
-          input_tokens?: number
-          output_tokens?: number
-          latency_ms?: number
+          conversation_id?: string
           created_at?: string
+          id?: string
+          input_tokens?: number | null
+          latency_ms?: number | null
+          metadata?: Json
+          output_tokens?: number | null
+          role?: string
         }
         Relationships: [
           {
@@ -530,108 +90,85 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ai_conversations"
             referencedColumns: ["id"]
-          }
-        ]
-      }
-      idea_generations: {
-        Row: {
-          id: string
-          conversation_id: string | null
-          user_id: string
-          idea_id: string | null
-          model: string
-          provider: string
-          prompt_version: string | null
-          structured_output: Json
-          input_tokens: number
-          output_tokens: number
-          latency_ms: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          conversation_id?: string | null
-          user_id: string
-          idea_id?: string | null
-          model: string
-          provider: string
-          prompt_version?: string | null
-          structured_output: Json
-          input_tokens?: number
-          output_tokens?: number
-          latency_ms?: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          conversation_id?: string | null
-          user_id?: string
-          idea_id?: string | null
-          model?: string
-          provider?: string
-          prompt_version?: string | null
-          structured_output?: Json
-          input_tokens?: number
-          output_tokens?: number
-          latency_ms?: number
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "idea_generations_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "ai_conversations"
-            referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "idea_generations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "idea_generations_idea_id_fkey"
-            columns: ["idea_id"]
-            isOneToOne: false
-            referencedRelation: "ideas"
-            referencedColumns: ["id"]
-          }
         ]
       }
       audit_events: {
         Row: {
-          id: string
-          user_id: string | null
-          event_type: string
-          entity_type: string
-          entity_id: string | null
-          metadata: Json
-          ip_address: string | null
           created_at: string
+          entity_id: string | null
+          entity_type: string
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_id: string | null
         }
         Insert: {
-          id?: string
-          user_id?: string | null
-          event_type: string
-          entity_type: string
-          entity_id?: string | null
-          metadata?: Json
-          ip_address?: string | null
           created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_id?: string | null
         }
         Update: {
-          id?: string
-          user_id?: string | null
-          event_type?: string
-          entity_type?: string
-          entity_id?: string | null
-          metadata?: Json
-          ip_address?: string | null
           created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_id?: string | null
         }
         Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          parent_id: string | null
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_id?: string | null
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       content_blog_post_comments: {
         Row: {
@@ -707,33 +244,892 @@ export type Database = {
         }
         Relationships: []
       }
+      goals: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          slug: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      idea_competitors: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          idea_id: string
+          name: string
+          pricing_model: string | null
+          strength: string | null
+          updated_at: string
+          user_complaints: string | null
+          user_id: string
+          vulnerability: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          idea_id: string
+          name: string
+          pricing_model?: string | null
+          strength?: string | null
+          updated_at?: string
+          user_complaints?: string | null
+          user_id: string
+          vulnerability: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          idea_id?: string
+          name?: string
+          pricing_model?: string | null
+          strength?: string | null
+          updated_at?: string
+          user_complaints?: string | null
+          user_id?: string
+          vulnerability?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_competitors_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "active_ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_competitors_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_competitors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      idea_experiments: {
+        Row: {
+          created_at: string
+          current_result: string | null
+          experiment_type: string
+          id: string
+          idea_id: string
+          status: string
+          target_metric: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_result?: string | null
+          experiment_type: string
+          id?: string
+          idea_id: string
+          status?: string
+          target_metric: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_result?: string | null
+          experiment_type?: string
+          id?: string
+          idea_id?: string
+          status?: string
+          target_metric?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_experiments_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "active_ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_experiments_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_experiments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      idea_generations: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          id: string
+          idea_id: string | null
+          input_tokens: number | null
+          latency_ms: number | null
+          model: string
+          output_tokens: number | null
+          prompt_version: string | null
+          provider: string
+          structured_output: Json
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          idea_id?: string | null
+          input_tokens?: number | null
+          latency_ms?: number | null
+          model: string
+          output_tokens?: number | null
+          prompt_version?: string | null
+          provider: string
+          structured_output: Json
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          idea_id?: string | null
+          input_tokens?: number | null
+          latency_ms?: number | null
+          model?: string
+          output_tokens?: number | null
+          prompt_version?: string | null
+          provider?: string
+          structured_output?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_generations_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_generations_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "active_ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_generations_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_generations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      idea_interviews: {
+        Row: {
+          company_or_channel: string | null
+          created_at: string
+          id: string
+          idea_id: string
+          key_quote: string
+          name: string
+          pain_score: number
+          role: string | null
+          updated_at: string
+          user_id: string
+          verdict: string
+          willingness_to_pay: string | null
+        }
+        Insert: {
+          company_or_channel?: string | null
+          created_at?: string
+          id?: string
+          idea_id: string
+          key_quote: string
+          name: string
+          pain_score?: number
+          role?: string | null
+          updated_at?: string
+          user_id: string
+          verdict?: string
+          willingness_to_pay?: string | null
+        }
+        Update: {
+          company_or_channel?: string | null
+          created_at?: string
+          id?: string
+          idea_id?: string
+          key_quote?: string
+          name?: string
+          pain_score?: number
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+          verdict?: string
+          willingness_to_pay?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idea_interviews_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "active_ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_interviews_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "idea_interviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ideas: {
+        Row: {
+          ai_generated: boolean
+          ai_generation_id: string | null
+          ai_model: string | null
+          category_id: string | null
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          difficulty: string
+          estimated_cost: string | null
+          estimated_time: string | null
+          id: string
+          monetization: string | null
+          mvp_features: Json
+          owner_id: string | null
+          problem: string | null
+          published_at: string | null
+          short_description: string
+          slug: string
+          solution: string | null
+          status: string
+          target_audience: string | null
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          ai_generated?: boolean
+          ai_generation_id?: string | null
+          ai_model?: string | null
+          category_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          difficulty?: string
+          estimated_cost?: string | null
+          estimated_time?: string | null
+          id?: string
+          monetization?: string | null
+          mvp_features?: Json
+          owner_id?: string | null
+          problem?: string | null
+          published_at?: string | null
+          short_description: string
+          slug: string
+          solution?: string | null
+          status?: string
+          target_audience?: string | null
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          ai_generated?: boolean
+          ai_generation_id?: string | null
+          ai_model?: string | null
+          category_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          difficulty?: string
+          estimated_cost?: string | null
+          estimated_time?: string | null
+          id?: string
+          monetization?: string | null
+          mvp_features?: Json
+          owner_id?: string | null
+          problem?: string | null
+          published_at?: string | null
+          short_description?: string
+          slug?: string
+          solution?: string | null
+          status?: string
+          target_audience?: string | null
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ideas_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ideas_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      market_trends: {
+        Row: {
+          category: string
+          competition_density: string
+          created_at: string
+          growth_rate: string
+          id: string
+          opportunity_score: number
+          overview: string
+          signal_strength: string
+          slug: string
+          source: string | null
+          starter_prompt: string | null
+          target_audience: string | null
+          title: string
+          unsolved_pains: Json
+          updated_at: string
+          whitespace_moat: string | null
+        }
+        Insert: {
+          category: string
+          competition_density?: string
+          created_at?: string
+          growth_rate: string
+          id?: string
+          opportunity_score?: number
+          overview: string
+          signal_strength?: string
+          slug: string
+          source?: string | null
+          starter_prompt?: string | null
+          target_audience?: string | null
+          title: string
+          unsolved_pains?: Json
+          updated_at?: string
+          whitespace_moat?: string | null
+        }
+        Update: {
+          category?: string
+          competition_density?: string
+          created_at?: string
+          growth_rate?: string
+          id?: string
+          opportunity_score?: number
+          overview?: string
+          signal_strength?: string
+          slug?: string
+          source?: string | null
+          starter_prompt?: string | null
+          target_audience?: string | null
+          title?: string
+          unsolved_pains?: Json
+          updated_at?: string
+          whitespace_moat?: string | null
+        }
+        Relationships: []
+      }
+      markets: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          region: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          region?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          region?: string | null
+        }
+        Relationships: []
+      }
       private_items: {
         Row: {
           created_at: string
           description: string
           id: string
           name: string
-          owner_id: string
+          owner_id: string | null
         }
         Insert: {
           created_at?: string
           description: string
           id?: string
           name: string
-          owner_id: string
+          owner_id?: string | null
         }
         Update: {
           created_at?: string
           description?: string
           id?: string
           name?: string
-          owner_id?: string
+          owner_id?: string | null
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          onboarding_completed: boolean
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          onboarding_completed?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          onboarding_completed?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      saved_ideas: {
+        Row: {
+          created_at: string
+          id: string
+          idea_id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idea_id: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idea_id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_ideas_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "active_ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_ideas_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_ideas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skills: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      user_goals: {
+        Row: {
+          goal_id: string
+          user_id: string
+        }
+        Insert: {
+          goal_id: string
+          user_id: string
+        }
+        Update: {
+          goal_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_goals_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_goals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_interests: {
+        Row: {
+          category_id: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_interests_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_interests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_markets: {
+        Row: {
+          market_id: string
+          user_id: string
+        }
+        Insert: {
+          market_id: string
+          user_id: string
+        }
+        Update: {
+          market_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_markets_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_markets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_preferences: {
+        Row: {
+          available_time: AvailableTime | null
+          budget_bracket: BudgetBracket | null
+          created_at: string
+          experience_level: ExperienceLevel | null
+          id: string
+          target_audience_focus: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_time?: AvailableTime | null
+          budget_bracket?: BudgetBracket | null
+          created_at?: string
+          experience_level?: ExperienceLevel | null
+          id?: string
+          target_audience_focus?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_time?: AvailableTime | null
+          budget_bracket?: BudgetBracket | null
+          created_at?: string
+          experience_level?: ExperienceLevel | null
+          id?: string
+          target_audience_focus?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_skills: {
+        Row: {
+          skill_id: string
+          user_id: string
+        }
+        Insert: {
+          skill_id: string
+          user_id: string
+        }
+        Update: {
+          skill_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_trend_bookmarks: {
+        Row: {
+          created_at: string
+          trend_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          trend_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          trend_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_trend_bookmarks_trend_id_fkey"
+            columns: ["trend_id"]
+            isOneToOne: false
+            referencedRelation: "market_trends"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_trend_bookmarks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      active_ideas: {
+        Row: {
+          ai_generated: boolean | null
+          ai_generation_id: string | null
+          ai_model: string | null
+          category_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          difficulty: string | null
+          estimated_cost: string | null
+          estimated_time: string | null
+          id: string | null
+          monetization: string | null
+          mvp_features: Json | null
+          owner_id: string | null
+          problem: string | null
+          published_at: string | null
+          short_description: string | null
+          slug: string | null
+          solution: string | null
+          status: string | null
+          target_audience: string | null
+          title: string | null
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          ai_generated?: boolean | null
+          ai_generation_id?: string | null
+          ai_model?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_cost?: string | null
+          estimated_time?: string | null
+          id?: string | null
+          monetization?: string | null
+          mvp_features?: Json | null
+          owner_id?: string | null
+          problem?: string | null
+          published_at?: string | null
+          short_description?: string | null
+          slug?: string | null
+          solution?: string | null
+          status?: string | null
+          target_audience?: string | null
+          title?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          ai_generated?: boolean | null
+          ai_generation_id?: string | null
+          ai_model?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          estimated_cost?: string | null
+          estimated_time?: string | null
+          id?: string | null
+          monetization?: string | null
+          mvp_features?: Json | null
+          owner_id?: string | null
+          problem?: string | null
+          published_at?: string | null
+          short_description?: string | null
+          slug?: string | null
+          solution?: string | null
+          status?: string | null
+          target_audience?: string | null
+          title?: string | null
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ideas_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ideas_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
@@ -747,20 +1143,20 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__internals__">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals["public"]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -784,11 +1180,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -809,11 +1205,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -834,11 +1230,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -851,11 +1247,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -868,4 +1264,11 @@ export const Constants = {
   public: {
     Enums: {},
   },
-} as const
+} as const;
+
+export type ExperienceLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT';
+export type AvailableTime = 'LESS_THAN_1_HR' | '1_TO_2_HRS' | '2_TO_4_HRS' | '4_TO_8_HRS' | 'FULL_TIME';
+export type BudgetBracket = 'ZERO' | '1_TO_50' | '50_TO_250' | '250_TO_1000' | '1000_PLUS' | 'NOT_SURE';
+export type IdeaDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'HARD';
+export type IdeaVisibility = 'PRIVATE' | 'PUBLIC' | 'UNLISTED';
+export type IdeaStatus = 'DRAFT' | 'SAVED' | 'VALIDATING' | 'BUILDING' | 'LAUNCHED' | 'ARCHIVED';

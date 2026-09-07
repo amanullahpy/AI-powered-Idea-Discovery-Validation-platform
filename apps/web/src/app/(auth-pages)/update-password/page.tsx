@@ -1,9 +1,11 @@
 import { Suspense } from 'react';
+import { connection } from 'next/server';
 import { getCachedLoggedInVerifiedSupabaseUser } from '@/rsc-data/supabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UpdatePassword } from './UpdatePassword';
 
 async function UpdatePasswordContent() {
+  await connection();
   await getCachedLoggedInVerifiedSupabaseUser();
   return <UpdatePassword />;
 }

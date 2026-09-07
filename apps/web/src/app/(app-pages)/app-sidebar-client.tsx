@@ -2,6 +2,7 @@
 
 import type { User } from '@supabase/supabase-js';
 import {
+  Activity,
   Bookmark,
   ChevronUp,
   Compass,
@@ -11,7 +12,10 @@ import {
   LogOut,
   Plus,
   Settings,
+  ShieldCheck,
   Sparkles,
+  Target,
+  TrendingUp,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -40,12 +44,22 @@ import {
 } from '@/components/ui/sidebar';
 import { signOutAction } from '@/data/auth/sign-out';
 
-const navigationItems = [
+const coreNavigation = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'AI Co-pilot', url: '/ai', icon: Sparkles },
   { title: 'Discover Ideas', url: '/discover', icon: Compass },
+  { title: 'Market Trends', url: '/trends', icon: TrendingUp },
+];
+
+const ventureNavigation = [
   { title: 'My Ideas', url: '/ideas', icon: Lightbulb },
   { title: 'Saved Ideas', url: '/saved', icon: Bookmark },
+  { title: 'Validation Matrix', url: '/validation', icon: Target },
+  { title: 'Competitor Moats', url: '/competitors', icon: ShieldCheck },
+];
+
+const systemNavigation = [
+  { title: 'Activity & Audit', url: '/activity', icon: Activity },
   { title: 'Settings', url: '/settings', icon: Settings },
 ];
 
@@ -75,6 +89,7 @@ export function AppSidebarContent({ user }: { user: User }) {
   return (
     <>
       <SidebarContent>
+        {/* Core Group */}
         <SidebarGroup>
           <SidebarGroupLabel>Idea Discovery</SidebarGroupLabel>
           <SidebarGroupAction asChild title="New AI Idea">
@@ -85,19 +100,58 @@ export function AppSidebarContent({ user }: { user: User }) {
           </SidebarGroupAction>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map((item) => {
-                const isActive =
-                  pathname === item.url ||
-                  (item.url === '/private-items' && pathname.startsWith('/private-item/'));
+              {coreNavigation.map((item) => {
+                const isActive = pathname === item.url;
                 const Icon = item.icon;
-
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.title}
-                    >
+                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+                      <Link href={item.url}>
+                        <Icon aria-hidden="true" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Venture Lab & Validation Group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Venture Studio</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {ventureNavigation.map((item) => {
+                const isActive = pathname === item.url || (item.url === '/ideas' && pathname.startsWith('/ideas/'));
+                const Icon = item.icon;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+                      <Link href={item.url}>
+                        <Icon aria-hidden="true" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Governance & System Group */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {systemNavigation.map((item) => {
+                const isActive = pathname === item.url;
+                const Icon = item.icon;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
                       <Link href={item.url}>
                         <Icon aria-hidden="true" />
                         <span>{item.title}</span>

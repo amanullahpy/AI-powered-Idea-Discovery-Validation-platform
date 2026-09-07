@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { siteConfig } from '@/config/site';
 
+export const instant = false;
+
 export const metadata = {
   title: `Saved Ideas — ${siteConfig.name}`,
   description: `Your bookmarked ideas and inspirations on ${siteConfig.name}.`,

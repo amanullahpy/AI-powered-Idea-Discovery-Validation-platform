@@ -32,7 +32,8 @@ import {
   Users,
 } from 'lucide-react';
 import { updateIdeaVisibilityAction, updateIdeaStatusAction, validateIdeaAction } from '@/data/ideas/actions';
-import type { IdeaItem } from '@/components/ideas/idea-card';
+import { IdeaExporter } from '@/components/ideas/idea-exporter';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 
 interface IdeaCockpitProps {
@@ -44,6 +45,7 @@ export function IdeaCockpit({ idea }: IdeaCockpitProps) {
   const [status, setStatus] = useState(idea.status);
   const [validationReport, setValidationReport] = useState<any>(null);
   const [isValidating, setIsValidating] = useState(false);
+  const [completedMilestones, setCompletedMilestones] = useState<Record<number, boolean>>({});
   const [isPending, startTransition] = useTransition();
 
   const mvpFeatures: string[] = Array.isArray(idea.mvp_features) ? idea.mvp_features : [];
@@ -151,6 +153,9 @@ export function IdeaCockpit({ idea }: IdeaCockpitProps) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Idea Exporter */}
+          <IdeaExporter idea={idea} className="h-8 text-xs font-semibold" />
 
           {(visibility === 'PUBLIC' || visibility === 'UNLISTED') && (
             <Button size="sm" variant="default" onClick={handleShare} className="h-8 text-xs font-semibold">
@@ -373,15 +378,54 @@ export function IdeaCockpit({ idea }: IdeaCockpitProps) {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-foreground">30-Day Launch Roadmap:</span>
-                    <div className="space-y-1.5">
-                      {validationReport.thirtyDayRoadmap?.map((week: string, i: number) => (
-                        <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground p-2 rounded border bg-muted/20">
-                          <CheckCircle2 className="size-3.5 text-emerald-500 mt-0.5 shrink-0" />
-                          <span>{week}</span>
-                        </div>
-                      ))}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-foreground">30-Day Launch Roadmap</span>
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {Object.values(completedMilestones).filter(Boolean).length} of {validationReport.thirtyDayRoadmap?.length || 0} completed
+                      </span>
+                    </div>
+                    {validationReport.thirtyDayRoadmap?.length > 0 && (
+                      <Progress
+                        value={Math.round(
+                          (Object.values(completedMilestones).filter(Boolean).length /
+                            validationReport.thirtyDayRoadmap.length) *
+                            100
+                        )}
+                        className="h-2"
+                      />
+                    )}
+                    <div className="space-y-2 pt-1">
+                      {validationReport.thirtyDayRoadmap?.map((week: string, i: number) => {
+                        const isDone = !!completedMilestones[i];
+                        return (
+                          <div
+                            key={i}
+                            onClick={() =>
+                              setCompletedMilestones((prev) => ({
+                                ...prev,
+                                [i]: !prev[i],
+                              }))
+                            }
+                            className={`flex items-start gap-2.5 text-xs p-3 rounded-lg border cursor-pointer transition-all ${
+                              isDone
+                                ? 'bg-emerald-500/5 border-emerald-500/30 text-foreground'
+                                : 'bg-card hover:bg-accent/40 text-muted-foreground border-border'
+                            }`}
+                          >
+                            <div className="mt-0.5 shrink-0">
+                              <CheckCircle2
+                                className={`size-4 transition-colors ${
+                                  isDone ? 'text-emerald-500 fill-emerald-500/20' : 'text-muted-foreground/40'
+                                }`}
+                              />
+                            </div>
+                            <span className={isDone ? 'line-through text-muted-foreground' : 'text-foreground'}>
+                              {week}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

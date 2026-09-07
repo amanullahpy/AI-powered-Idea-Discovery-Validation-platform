@@ -14,6 +14,12 @@ import { usePathname } from 'next/navigation';
 
 const routeLabels: Record<string, string> = {
     dashboard: 'Dashboard',
+    ai: 'AI Co-pilot',
+    discover: 'Discover Ideas',
+    ideas: 'My Ideas',
+    saved: 'Saved Ideas',
+    settings: 'Settings',
+    onboarding: 'Onboarding',
     'private-items': 'Private Items',
     'private-item': 'Private Item',
     item: 'Item',

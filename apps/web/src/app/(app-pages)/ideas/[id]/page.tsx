@@ -1,8 +1,10 @@
-import { getCachedLoggedInUserId } from '@/rsc-data/supabase';
+import { getCachedLoggedInUserId, getCachedLoggedInSupabaseUser } from '@/rsc-data/supabase';
 import { getIdeaById } from '@/data/ideas/actions';
 import { IdeaCockpit } from './idea-cockpit';
 import { notFound, redirect } from 'next/navigation';
 import { siteConfig } from '@/config/site';
+
+export const instant = false;
 
 interface IdeaDetailPageProps {
   params: Promise<{ id: string }>;
@@ -10,7 +12,14 @@ interface IdeaDetailPageProps {
 
 export async function generateMetadata({ params }: IdeaDetailPageProps) {
   const { id } = await params;
-  const idea = await getIdeaById(id);
+  let userId: string | undefined;
+  try {
+    const user = await getCachedLoggedInSupabaseUser();
+    userId = user?.id;
+  } catch {
+    // Unauthenticated
+  }
+  const idea = await getIdeaById(id, userId);
   if (!idea) {
     return { title: `Idea Not Found — ${siteConfig.name}` };
   }

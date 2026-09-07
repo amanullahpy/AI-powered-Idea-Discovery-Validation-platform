@@ -1,6 +1,7 @@
 'use server';
 
 import { authActionClient } from '@/lib/safe-action';
+import { checkRateLimit } from '@/lib/ai/rate-limiter';
 import { createSupabaseClient, createStaticSupabaseClient } from '@/supabase-clients/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -265,6 +266,14 @@ export async function getPublicIdeas(filters?: { categorySlug?: string; difficul
 export const createIdeaAction = authActionClient
   .schema(createIdeaSchema)
   .action(async ({ parsedInput, ctx }) => {
+    const rateLimit = checkRateLimit(`rate_limit:create_idea:${ctx.userId}`, {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      throw new Error(`Rate limit exceeded for creating ideas. Please wait ${rateLimit.retryAfterSec}s.`);
+    }
+
     const supabase = await createSupabaseClient();
     const userId = ctx.userId;
     const slug = slugify(parsedInput.title);
@@ -317,6 +326,14 @@ export const createIdeaAction = authActionClient
 export const updateIdeaAction = authActionClient
   .schema(updateIdeaSchema)
   .action(async ({ parsedInput, ctx }) => {
+    const rateLimit = checkRateLimit(`rate_limit:update_idea:${ctx.userId}`, {
+      maxRequests: 40,
+      windowMs: 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      throw new Error(`Rate limit exceeded for updating ideas. Please wait ${rateLimit.retryAfterSec}s.`);
+    }
+
     const supabase = await createSupabaseClient();
     const userId = ctx.userId;
 
@@ -423,6 +440,14 @@ export const updateIdeaStatusAction = authActionClient
 export const toggleSaveIdeaAction = authActionClient
   .schema(toggleSaveIdeaSchema)
   .action(async ({ parsedInput, ctx }) => {
+    const rateLimit = checkRateLimit(`rate_limit:save_idea:${ctx.userId}`, {
+      maxRequests: 50,
+      windowMs: 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      throw new Error(`Rate limit exceeded. Please wait ${rateLimit.retryAfterSec}s.`);
+    }
+
     const supabase = await createSupabaseClient();
     const userId = ctx.userId;
 
@@ -463,6 +488,14 @@ export const toggleSaveIdeaAction = authActionClient
 export const deleteIdeaAction = authActionClient
   .schema(deleteIdeaSchema)
   .action(async ({ parsedInput, ctx }) => {
+    const rateLimit = checkRateLimit(`rate_limit:delete_idea:${ctx.userId}`, {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      throw new Error(`Rate limit exceeded. Please wait ${rateLimit.retryAfterSec}s.`);
+    }
+
     const supabase = await createSupabaseClient();
     const userId = ctx.userId;
 
@@ -507,6 +540,14 @@ export const validateIdeaAction = authActionClient
     })
   )
   .action(async ({ parsedInput, ctx }) => {
+    const rateLimit = checkRateLimit(`rate_limit:validate_idea:${ctx.userId}`, {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      throw new Error(`Rate limit exceeded for idea validation. Please wait ${rateLimit.retryAfterSec}s.`);
+    }
+
     const idea = await getIdeaById(parsedInput.ideaId, ctx.userId);
     if (!idea) throw new Error('Idea not found or access denied.');
 

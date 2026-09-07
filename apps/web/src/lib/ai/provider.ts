@@ -1,5 +1,8 @@
 import { z } from 'zod';
 import { siteConfig } from '@/config/site';
+import { buildSystemPrompt, PersonaArchetype } from './prompts';
+import { optimizeConversationHistory, estimateTokens } from './memory';
+import { AIProviderId } from './models';
 
 export const structuredIdeaSchema = z.object({
   title: z.string().min(3).max(120),
@@ -26,10 +29,19 @@ export interface AIMessageContext {
 export interface UserPersonalizationContext {
   interests?: string[];
   skills?: string[];
+  goals?: string[];
+  markets?: string[];
   experienceLevel?: string | null;
   budgetBracket?: string | null;
   availableTime?: string | null;
   targetMarket?: string | null;
+  personaArchetype?: PersonaArchetype;
+}
+
+export interface ProviderCallConfig {
+  provider?: AIProviderId;
+  modelId?: string;
+  customApiKey?: string;
 }
 
 export interface GenerationResult {
@@ -52,97 +64,96 @@ export interface ChatResult {
 }
 
 /**
- * Intelligent Synthesizer: produces rich, realistic ideas based on user inputs
- * Used when no external API key is configured or as an instant reliable fallback
+ * Intelligent Local Synthesizer:
+ * Realistic, domain-tailored generation that runs with zero API keys or during offline/fallback mode.
  */
-function synthesizeIdeaFromPrompt(
+export function synthesizeIdeaFromPrompt(
   prompt: string,
   userContext?: UserPersonalizationContext
 ): StructuredIdeaOutput {
   const p = prompt.toLowerCase();
 
   let categorySlug = 'saas';
-  if (p.includes('ai') || p.includes('bot') || p.includes('gpt') || p.includes('agent')) categorySlug = 'ai-products';
+  if (p.includes('ai') || p.includes('bot') || p.includes('agent') || p.includes('llm')) categorySlug = 'ai-products';
   else if (p.includes('mobile') || p.includes('ios') || p.includes('android')) categorySlug = 'mobile-apps';
-  else if (p.includes('side hustle') || p.includes('quick cash') || p.includes('part-time')) categorySlug = 'side-hustles';
-  else if (p.includes('student') || p.includes('fyp') || p.includes('college') || p.includes('university')) categorySlug = 'student-fyp';
+  else if (p.includes('side hustle') || p.includes('passive') || p.includes('cash') || p.includes('part-time')) categorySlug = 'side-hustles';
+  else if (p.includes('student') || p.includes('fyp') || p.includes('college') || p.includes('university') || p.includes('exam')) categorySlug = 'student-fyp';
   else if (p.includes('ecommerce') || p.includes('shop') || p.includes('store') || p.includes('product')) categorySlug = 'ecommerce';
-  else if (p.includes('dev') || p.includes('code') || p.includes('cli') || p.includes('tool')) categorySlug = 'developer-tools';
-  else if (p.includes('automation') || p.includes('workflow')) categorySlug = 'automation';
+  else if (p.includes('dev') || p.includes('code') || p.includes('cli') || p.includes('api') || p.includes('github')) categorySlug = 'developer-tools';
+  else if (p.includes('automation') || p.includes('workflow') || p.includes('webhook')) categorySlug = 'automation';
   else if (userContext?.interests?.[0]) {
-    categorySlug = userContext.interests[0];
+    categorySlug = userContext.interests[0].toLowerCase().replace(/\s+/g, '-');
   }
 
-  // Derive title from keywords
+  // Base concept derivation
   let title = 'SmartFlow: Automated Workflow Intelligence';
-  let shortDesc = 'An intuitive platform that optimizes repetitive digital processes for small teams.';
-  let problem = 'Small teams and solo operators spend 15+ hours weekly on tedious manual data transfer, email follow-ups, and disconnected SaaS handoffs.';
-  let solution = 'A lightweight, focused connector that watches triggers across email and databases to execute predefined multi-step actions with zero setup overhead.';
+  let shortDesc = 'A focused webhook and micro-automation connector that eliminates repetitive manual SaaS handoffs.';
+  let problem = 'Solo founders, agencies, and lean teams spend 12+ hours weekly on tedious manual data entry, customer follow-up syncs, and disconnected SaaS handoffs.';
+  let solution = 'A lightweight, zero-overhead connector that monitors incoming triggers (webhooks, forms, emails) and executes conditional multi-step automations with instant error alerts.';
   let targetAudience = 'Solo entrepreneurs, boutique digital agencies, and remote knowledge workers.';
-  let monetization = '$19/month solo tier, $49/month team plan with unlimited automations.';
+  let monetization = '$19/month solo tier (up to 5,000 tasks), $49/month team tier with priority webhooks.';
   let difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'HARD' = 'INTERMEDIATE';
-  let cost = '$50 - $250';
-  let time = '2 - 4 weeks';
+  let cost = '$20 - $80';
+  let time = '2 - 3 weeks';
   let mvpFeatures = [
-    'One-click Google Workspace & Slack webhook integration',
-    'Visual 3-step action builder (Trigger → Filter → Action)',
-    'Real-time execution log with instant failure notifications',
-    'Template library for the 10 most common agency workflows',
+    'One-click Google Sheets, Slack, and Discord webhook integration',
+    'Visual 3-step action builder (Trigger -> Filter -> Action)',
+    'Real-time execution log with instant retry functionality',
+    'Pre-built template library for 10 common creator/agency workflows',
   ];
 
-  if (p.includes('student') || p.includes('fyp')) {
+  if (p.includes('student') || p.includes('fyp') || userContext?.personaArchetype === 'student') {
     title = 'StudyCollab: AI Campus Exam Prep & Peer Review';
-    shortDesc = 'Collaborative revision rooms that turn lecture slides and syllabus notes into interactive mock exams.';
-    problem = 'Students study in isolation, struggle to predict exam question patterns, and lack structured peer feedback on mock tests.';
-    solution = 'Upload past lecture PDFs to generate customized practice exams, participate in timed revision sessions with classmates, and compare explanations.';
-    targetAudience = 'Undergraduate university students and study groups.';
-    monetization = 'Freemium for basic rooms, $7/semester student pass for unlimited AI mock tests.';
+    shortDesc = 'Collaborative revision rooms that turn lecture PDFs and past papers into interactive mock exam questions.';
+    problem = 'University students study in isolation, struggle to predict exam question structures, and lack fast peer review feedback on complex practice questions.';
+    solution = 'Upload lecture slide PDFs to generate customized practice exams, participate in synchronized timed revision rooms with classmates, and compare detailed explanations.';
+    targetAudience = 'Undergraduate university students, study cohorts, and academic tutors.';
+    monetization = 'Free for 3 mock exams per month, $5/semester student pass for unlimited generation.';
     difficulty = 'BEGINNER';
-    cost = '$0 - $50';
+    cost = '$0 - $30';
     time = '2 - 3 weeks';
     mvpFeatures = [
-      'Lecture slide PDF to quiz generator',
-      'Live synchronized study room with countdown timer',
-      'Peer review answer comparison board',
-      'Weakness diagnosis report per syllabus topic',
+      'Lecture slide PDF to interactive quiz transformer',
+      'Synchronized multiplayer study room with countdown timer',
+      'Peer review answer comparison board with instant scoring',
+      'Weakness diagnosis scorecard highlighting syllabus blind spots',
     ];
-  } else if (p.includes('pakistan') || p.includes('local business')) {
-    title = 'DukaanPay: Quick WhatsApp Billing & Khata for Retail';
-    shortDesc = 'Micro-invoicing and ledger reconciliation for neighborhood retailers via WhatsApp messages.';
-    problem = 'Neighborhood shop owners manage credit sales (khata) on paper notebooks, resulting in delayed payments and unrecoverable disputes.';
-    solution = 'A fast mobile portal that sends automated SMS/WhatsApp payment links with instant JazzCash / EasyPaisa / Bank transfer settlement.';
-    targetAudience = 'Kiryana stores, wholesalers, and independent boutique retailers.';
-    monetization = '1% transaction fee on settled digital payments or 499 PKR/month subscription.';
+  } else if (p.includes('dev') || p.includes('code') || p.includes('cli') || p.includes('next.js')) {
+    title = 'EnvGuard: Zero-Leak Team Environment Manager';
+    shortDesc = 'Lightweight CLI and dashboard that injects verified, encrypted secrets into developer machines without exposing credentials in Git or CI logs.';
+    problem = 'Teams accidentally commit production API keys to GitHub, and new engineering onboarding is stalled for days waiting for .env credentials.';
+    solution = 'A single binary CLI that pulls encrypted scoped secrets into memory during local execution, with instant audit trails when variables are accessed.';
+    targetAudience = 'Full-stack software engineers, indie makers, and early-stage tech startups.';
+    monetization = 'Free for solo devs (up to 3 projects), $12/user/mo for teams with RBAC access audit logs.';
     difficulty = 'INTERMEDIATE';
-    cost = '$50 - $200';
-    time = '3 - 5 weeks';
-    mvpFeatures = [
-      'WhatsApp automated payment reminder triggers',
-      'One-tap customer ledger balance lookup',
-      'Instant QR code generator for store checkout',
-      'Daily profit and credit reconciliation report',
-    ];
-  } else if (p.includes('fast') || p.includes('two week') || p.includes('simple') || p.includes('low risk')) {
-    title = 'MicroAudit: 60-Second Landing Page Teardown';
-    shortDesc = 'Instant UX and copywriting teardown tool highlighting conversion leaks for bootstrapped founders.';
-    problem = 'Early-stage founders launch landing pages that suffer from high bounce rates and unclear value propositions without knowing why visitors leave.';
-    solution = 'Enter any URL to receive a structured 5-point conversion audit analyzing headline clarity, visual hierarchy, mobile speed, and trust signals.';
-    targetAudience = 'Indie hackers, ProductHunt makers, and solo digital creators.';
-    monetization = '$15 per full audit report or $39 for 5 audit credits.';
-    difficulty = 'BEGINNER';
-    cost = '$0 - $50';
+    cost = '$10 - $50';
     time = '1 - 2 weeks';
     mvpFeatures = [
-      'Automated screenshot & headline extraction',
+      'Encrypted CLI sync tool (`envguard run -- next dev`)',
+      'Project-level team role-based access dashboard',
+      'One-click secret rotation webhook notifications',
+      'Git pre-commit scanner preventing accidental secret leakage',
+    ];
+  } else if (p.includes('low risk') || p.includes('simple') || p.includes('2 week') || p.includes('$200') || userContext?.personaArchetype === 'side_hustle') {
+    title = 'MicroAudit: 60-Second Conversion Teardown for Founders';
+    shortDesc = 'Instant UX and copywriting teardown tool highlighting conversion leaks and friction points for bootstrapped founders.';
+    problem = 'Early-stage founders launch landing pages that suffer from high bounce rates and unclear value propositions without knowing why visitors leave.';
+    solution = 'Submit any website URL to receive a structured 5-point conversion audit analyzing headline clarity, visual hierarchy, mobile speed, and trust signals.';
+    targetAudience = 'Indie hackers, ProductHunt makers, and solo digital creators.';
+    monetization = '$15 per full audit scorecard or $39 for 5 teardown credits.';
+    difficulty = 'BEGINNER';
+    cost = '$0 - $40';
+    time = '1 - 2 weeks';
+    mvpFeatures = [
+      'Automated screenshot & headline extraction engine',
       '5-pillar scoring checklist (Clarity, Value, Proof, CTA, Speed)',
-      'Actionable rewrite suggestions for hero section',
-      'Shareable PDF teardown scorecard',
+      'Actionable rewrite suggestions for hero section copy',
+      'Exportable high-converting PDF teardown scorecard',
     ];
   }
 
-  const whyItFits = userContext?.skills?.length
-    ? `Matches your skills in ${userContext.skills.slice(0, 3).join(', ')} and fits your target schedule.`
-    : `Designed for practical execution with minimal capital investment.`;
+  const skillsList = userContext?.skills?.length ? userContext.skills.slice(0, 3).join(', ') : 'modern web tools';
+  const whyItFits = `Tailored for ${userContext?.personaArchetype || 'bootstrapped execution'} using ${skillsList} with minimal capital overhead.`;
 
   return {
     title,
@@ -161,139 +172,342 @@ function synthesizeIdeaFromPrompt(
 }
 
 /**
- * Generate Structured Idea
+ * Robust extractor for structured idea JSON from LLM text responses
  */
-export async function generateStructuredIdea(
-  prompt: string,
-  userContext?: UserPersonalizationContext
-): Promise<GenerationResult> {
-  const startTime = Date.now();
+export function extractStructuredIdea(text: string): { idea: StructuredIdeaOutput | null; cleanText: string } {
+  if (!text) return { idea: null, cleanText: '' };
 
-  // If Gemini API Key is available in environment
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (geminiKey) {
+  // Match ```json ... ``` blocks
+  const jsonRegex = /```json\s*(\{[\s\S]*?\})\s*```/;
+  const match = text.match(jsonRegex);
+
+  if (match && match[1]) {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `You are a world-class startup ideator and venture architect. Return ONLY a valid JSON object strictly matching this schema:
-{
-  "title": string (3-80 chars),
-  "shortDescription": string (10-250 chars),
-  "categorySlug": string (one of: saas, ai-products, mobile-apps, web-apps, side-hustles, ecommerce, student-fyp, developer-tools, automation, startup),
-  "problem": string (detailed problem),
-  "solution": string (detailed proposed solution),
-  "targetAudience": string (specific ICP),
-  "monetization": string (pricing model),
-  "difficulty": "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "HARD",
-  "estimatedCost": string (e.g. "$50 - $250"),
-  "estimatedTime": string (e.g. "2 - 4 weeks"),
-  "mvpFeatures": string[] (3-6 key features),
-  "whyItFits": string (brief reason why this fits the user)
-}
-
-User request: "${prompt}"
-User Background: ${JSON.stringify(userContext || {})}`,
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              responseMimeType: 'application/json',
-              temperature: 0.7,
-            },
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const rawJsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (rawJsonText) {
-          const parsed = JSON.parse(rawJsonText);
-          const validated = structuredIdeaSchema.parse(parsed);
-          return {
-            idea: validated,
-            model: 'gemini-1.5-flash',
-            provider: 'Google Gemini',
-            inputTokens: data.usageMetadata?.promptTokenCount || 200,
-            outputTokens: data.usageMetadata?.candidatesTokenCount || 400,
-            latencyMs: Date.now() - startTime,
-          };
-        }
+      const parsed = JSON.parse(match[1]);
+      const validated = structuredIdeaSchema.safeParse(parsed);
+      if (validated.success) {
+        // Strip the json block from visible conversational text
+        const cleanText = text.replace(jsonRegex, '').trim();
+        return { idea: validated.data, cleanText };
       }
-    } catch (err) {
-      console.warn('Gemini API call failed, falling back to local synthesizer:', err);
+    } catch {
+      // ignore
     }
   }
 
-  // Fallback synthesizer
-  const idea = synthesizeIdeaFromPrompt(prompt, userContext);
+  // Fallback: look for naked JSON { ... }
+  const rawJsonMatch = text.match(/(\{[\s\S]*"title"[\s\S]*"categorySlug"[\s\S]*\})/);
+  if (rawJsonMatch && rawJsonMatch[1]) {
+    try {
+      const parsed = JSON.parse(rawJsonMatch[1]);
+      const validated = structuredIdeaSchema.safeParse(parsed);
+      if (validated.success) {
+        const cleanText = text.replace(rawJsonMatch[1], '').trim();
+        return { idea: validated.data, cleanText };
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  return { idea: null, cleanText: text };
+}
+
+/**
+ * Call Groq API (High Speed, OpenAI-compatible)
+ */
+async function callGroqAPI(
+  messages: Array<{ role: string; content: string }>,
+  modelId: string = 'llama-3.3-70b-versatile',
+  customKey?: string
+): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+  const apiKey = customKey || process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error('No Groq API key available');
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: modelId,
+      messages,
+      temperature: 0.7,
+      max_tokens: 2048,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Groq API error (${res.status}): ${errText.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content || '';
   return {
-    idea,
-    model: 'idea-synthesizer-v1',
-    provider: `${siteConfig.name} AI Engine`,
-    inputTokens: prompt.length / 4,
-    outputTokens: 350,
-    latencyMs: Date.now() - startTime,
+    text,
+    inputTokens: data.usage?.prompt_tokens || 100,
+    outputTokens: data.usage?.completion_tokens || 250,
   };
 }
 
 /**
- * Handle Multi-turn Chat Conversation & Refinement
+ * Call OpenRouter API (Free models aggregator, OpenAI-compatible)
+ */
+async function callOpenRouterAPI(
+  messages: Array<{ role: string; content: string }>,
+  modelId: string = 'meta-llama/llama-3.3-70b-instruct:free',
+  customKey?: string
+): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+  const apiKey = customKey || process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new Error('No OpenRouter API key available');
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      'HTTP-Referer': siteConfig.url,
+      'X-Title': siteConfig.name,
+    },
+    body: JSON.stringify({
+      model: modelId,
+      messages,
+      temperature: 0.7,
+      max_tokens: 2048,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`OpenRouter API error (${res.status}): ${errText.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content || '';
+  return {
+    text,
+    inputTokens: data.usage?.prompt_tokens || 120,
+    outputTokens: data.usage?.completion_tokens || 280,
+  };
+}
+
+/**
+ * Call Google Gemini REST API (Native Google AI Studio)
+ */
+async function callGeminiAPI(
+  messages: Array<{ role: string; content: string }>,
+  modelId: string = 'gemini-2.0-flash',
+  customKey?: string
+): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+  const apiKey = customKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('No Gemini API key available');
+
+  // Separate system message if present
+  const systemMsg = messages.find((m) => m.role === 'system');
+  const userAndAssistantMsgs = messages.filter((m) => m.role !== 'system');
+
+  const contents = userAndAssistantMsgs.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }],
+  }));
+
+  const payload: any = {
+    contents,
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 2048,
+    },
+  };
+
+  if (systemMsg) {
+    payload.systemInstruction = {
+      parts: [{ text: systemMsg.content }],
+    };
+  }
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Gemini API error (${res.status}): ${errText.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return {
+    text,
+    inputTokens: data.usageMetadata?.promptTokenCount || 150,
+    outputTokens: data.usageMetadata?.candidatesTokenCount || 300,
+  };
+}
+
+/**
+ * Multi-Provider Unified Caller:
+ * Dispatches to Groq, OpenRouter, Gemini, or cascade fallback
+ */
+async function dispatchAICall(
+  messages: Array<{ role: string; content: string }>,
+  config?: ProviderCallConfig
+): Promise<{ text: string; model: string; provider: string; inputTokens: number; outputTokens: number }> {
+  const provider = config?.provider || 'auto';
+  const requestedModel = config?.modelId;
+
+  // 1. Explicit Groq request
+  if (provider === 'groq') {
+    const model = requestedModel || 'llama-3.3-70b-versatile';
+    const res = await callGroqAPI(messages, model, config?.customApiKey);
+    return { ...res, model, provider: 'Groq Cloud' };
+  }
+
+  // 2. Explicit OpenRouter request
+  if (provider === 'openrouter') {
+    const model = requestedModel || 'meta-llama/llama-3.3-70b-instruct:free';
+    const res = await callOpenRouterAPI(messages, model, config?.customApiKey);
+    return { ...res, model, provider: 'OpenRouter Free' };
+  }
+
+  // 3. Explicit Gemini request
+  if (provider === 'gemini') {
+    const model = requestedModel || 'gemini-2.0-flash';
+    const res = await callGeminiAPI(messages, model, config?.customApiKey);
+    return { ...res, model, provider: 'Google Gemini' };
+  }
+
+  // 4. Auto Mode: Cascade through available keys
+  // A. Try Groq if key exists
+  if (config?.customApiKey || process.env.GROQ_API_KEY) {
+    try {
+      const model = requestedModel || 'llama-3.3-70b-versatile';
+      const res = await callGroqAPI(messages, model, config?.customApiKey);
+      return { ...res, model, provider: 'Groq Cloud' };
+    } catch (err) {
+      console.warn('Auto mode Groq failed, trying OpenRouter...', err);
+    }
+  }
+
+  // B. Try OpenRouter if key exists
+  if (config?.customApiKey || process.env.OPENROUTER_API_KEY) {
+    try {
+      const model = requestedModel || 'meta-llama/llama-3.3-70b-instruct:free';
+      const res = await callOpenRouterAPI(messages, model, config?.customApiKey);
+      return { ...res, model, provider: 'OpenRouter' };
+    } catch (err) {
+      console.warn('Auto mode OpenRouter failed, trying Gemini...', err);
+    }
+  }
+
+  // C. Try Gemini if key exists
+  if (config?.customApiKey || process.env.GEMINI_API_KEY) {
+    try {
+      const model = requestedModel || 'gemini-2.0-flash';
+      const res = await callGeminiAPI(messages, model, config?.customApiKey);
+      return { ...res, model, provider: 'Google Gemini' };
+    } catch (err) {
+      console.warn('Auto mode Gemini failed, falling back to synthesizer...', err);
+    }
+  }
+
+  throw new Error('No working AI provider available');
+}
+
+/**
+ * Main Entry Point: Multi-turn Chat & Structured Idea Generation
  */
 export async function generateChatResponse(
   messages: AIMessageContext[],
-  userContext?: UserPersonalizationContext
+  userContext?: UserPersonalizationContext,
+  config?: ProviderCallConfig
 ): Promise<ChatResult> {
   const startTime = Date.now();
   const latestMessage = messages[messages.length - 1]?.content || '';
 
-  // Generate an updated structured idea if the user asks for refinement or creation
-  const isIdeaRequest =
-    latestMessage.toLowerCase().includes('idea') ||
-    latestMessage.toLowerCase().includes('build') ||
-    latestMessage.toLowerCase().includes('make it') ||
-    latestMessage.toLowerCase().includes('simpler') ||
-    latestMessage.toLowerCase().includes('alternative') ||
-    latestMessage.toLowerCase().includes('change') ||
-    latestMessage.toLowerCase().includes('recommend') ||
-    messages.length <= 2;
+  // 1. Optimize conversation history to stay strictly within token budget
+  const { messages: optimizedHistory } = optimizeConversationHistory(messages, 3200);
 
-  let suggestedIdea: StructuredIdeaOutput | null = null;
-  if (isIdeaRequest) {
-    const gen = await generateStructuredIdea(latestMessage, userContext);
-    suggestedIdea = gen.idea;
+  // 2. Build system persona prompt
+  const systemPrompt = buildSystemPrompt(userContext, userContext?.personaArchetype || 'bootstrapper');
+
+  // Format messages payload with system prompt
+  const fullMessages = [
+    { role: 'system', content: systemPrompt },
+    ...optimizedHistory.map((m) => ({ role: m.role, content: m.content })),
+  ];
+
+  // 3. Dispatch to AI Provider with graceful fallback
+  try {
+    const aiResult = await dispatchAICall(fullMessages, config);
+    const latencyMs = Date.now() - startTime;
+
+    // Extract structured idea if present
+    const { idea, cleanText } = extractStructuredIdea(aiResult.text);
+
+    return {
+      reply: cleanText || aiResult.text,
+      suggestedIdea: idea,
+      model: aiResult.model,
+      provider: aiResult.provider,
+      inputTokens: aiResult.inputTokens,
+      outputTokens: aiResult.outputTokens,
+      latencyMs,
+    };
+  } catch (err) {
+    console.warn('All cloud AI providers failed or no keys set. Using local idea synthesizer engine.', err);
+
+    // Fallback: Local Synthesizer Engine
+    const latencyMs = Date.now() - startTime;
+    const idea = synthesizeIdeaFromPrompt(latestMessage, userContext);
+
+    const fallbackReply = `I've analyzed your project parameters and generated a tailored concept blueprint for **${idea.title}** below.
+
+### Strategic Highlights
+* **Core Problem:** ${idea.problem}
+* **Proposed MVP Solution:** ${idea.solution}
+* **Target Audience:** ${idea.targetAudience}
+* **Monetization Angle:** ${idea.monetization}
+
+You can view the full blueprint details in the card below, or ask me to:
+* **Simplify the scope** to ship in under 7 days
+* **Test alternative monetization channels** (usage-based, freemium, upfront)
+* **Outline the unfair distribution strategy** for organic reach`;
+
+    return {
+      reply: fallbackReply,
+      suggestedIdea: idea,
+      model: 'ideaforge-synthesizer-v2',
+      provider: `${siteConfig.name} Local Engine`,
+      inputTokens: estimateTokens(latestMessage),
+      outputTokens: 380,
+      latencyMs,
+    };
   }
+}
 
-  let replyText = `I've analyzed your constraints and crafted an idea concept for you: **${
-    suggestedIdea?.title || 'Custom Concept'
-  }**. 
-
-You can review the full blueprint, MVP scope, and financial estimates in the card below. Would you like to:
-• **Make it simpler** to build in under 2 weeks?
-• **Adjust the monetization model** (e.g. usage-based vs. subscription)?
-• **Narrow down the target audience**?
-• Or click **Save to My Ideas** to start planning!`;
-
-  if (latestMessage.toLowerCase().includes('simpler') || latestMessage.toLowerCase().includes('easier')) {
-    replyText = `I've streamlined this concept down to its absolute core MVP essentials so you can launch and validate it in days without unnecessary infrastructure. Check out the updated blueprint below!`;
-  }
+/**
+ * Generate a standalone structured idea
+ */
+export async function generateStructuredIdea(
+  prompt: string,
+  userContext?: UserPersonalizationContext,
+  config?: ProviderCallConfig
+): Promise<GenerationResult> {
+  const res = await generateChatResponse([{ role: 'user', content: prompt }], userContext, config);
+  const idea = res.suggestedIdea || synthesizeIdeaFromPrompt(prompt, userContext);
 
   return {
-    reply: replyText,
-    suggestedIdea,
-    model: 'idea-copilot-v1',
-    provider: `${siteConfig.name} AI Co-pilot`,
-    inputTokens: 150,
-    outputTokens: 250,
-    latencyMs: Date.now() - startTime,
+    idea,
+    model: res.model,
+    provider: res.provider,
+    inputTokens: res.inputTokens,
+    outputTokens: res.outputTokens,
+    latencyMs: res.latencyMs,
   };
 }

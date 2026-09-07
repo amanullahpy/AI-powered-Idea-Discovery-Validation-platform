@@ -43,18 +43,14 @@ export const getCachedLoggedInUserClaims = cache(async () => {
   }
 });
 
-// Boolean check for authentication (safe - never throws)
+// Boolean check for verified authentication (contacts auth server or verified session)
 export const getCachedIsUserLoggedIn = cache(async () => {
-  const claims = await getCachedLoggedInUserClaims();
-  if (claims?.sub) return true;
   const user = await getCachedLoggedInSupabaseUser();
   return !!user?.id;
 });
 
-// User ID getter (safe - returns string or null)
+// Verified User ID getter (guaranteed valid active user session)
 export const getCachedLoggedInUserId = cache(async () => {
-  const claims = await getCachedLoggedInUserClaims();
-  if (claims?.sub) return claims.sub;
   const user = await getCachedLoggedInSupabaseUser();
   return user?.id || null;
 });

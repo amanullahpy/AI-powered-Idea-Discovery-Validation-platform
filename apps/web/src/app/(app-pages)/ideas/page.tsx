@@ -4,6 +4,8 @@ import { IdeasWorkspace } from './ideas-workspace';
 import { redirect } from 'next/navigation';
 import { siteConfig } from '@/config/site';
 
+export const instant = false;
+
 export const metadata = {
   title: `My Ideas — ${siteConfig.name}`,
   description: `Manage, organize, and develop your saved and generated ideas on ${siteConfig.name}.`,

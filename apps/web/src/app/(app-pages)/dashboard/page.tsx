@@ -7,6 +7,8 @@ import { DashboardView } from './dashboard-view';
 import { redirect } from 'next/navigation';
 import { siteConfig } from '@/config/site';
 
+export const instant = false;
+
 export const metadata = {
   title: `Dashboard — ${siteConfig.name}`,
   description: `Your personalized ideas, AI tools, and project opportunities on ${siteConfig.name}.`,

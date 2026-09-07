@@ -3,7 +3,11 @@
 import { authActionClient } from '@/lib/safe-action';
 import { createSupabaseClient } from '@/supabase-clients/server';
 import { checkRateLimit } from '@/lib/ai/rate-limiter';
-import { generateChatResponse, structuredIdeaSchema, type StructuredIdeaOutput } from '@/lib/ai/provider';
+import {
+  generateChatResponse,
+  structuredIdeaSchema,
+  type UserPersonalizationContext,
+} from '@/lib/ai/provider';
 import { getUserOnboardingData } from '@/data/user/onboarding';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -19,6 +23,10 @@ const sendMessageSchema = z.object({
       })
     )
     .default([]),
+  provider: z.enum(['groq', 'openrouter', 'gemini', 'auto', 'local']).optional(),
+  modelId: z.string().optional(),
+  customApiKey: z.string().max(256).optional(),
+  personaArchetype: z.enum(['bootstrapper', 'student', 'side_hustle', 'scaler']).optional(),
 });
 
 export const sendMessageAndGenerateAction = authActionClient
@@ -28,34 +36,65 @@ export const sendMessageAndGenerateAction = authActionClient
     const userId = ctx.userId;
 
     // 1. Rate Limit check
-    const rateLimit = checkRateLimit(userId, { maxRequests: 20, windowMs: 60 * 1000 });
+    const rateLimit = checkRateLimit(userId, { maxRequests: 30, windowMs: 60 * 1000 });
     if (!rateLimit.allowed) {
       throw new Error(`Rate limit exceeded. Please wait ${rateLimit.retryAfterSec || 30} seconds.`);
     }
 
-    // 2. Fetch User Personalization Context
+    // 2. Fetch User Personalization Context & Taxonomy Names
     const userData = await getUserOnboardingData(userId);
-    const userContext = {
+
+    // Retrieve readable names for skills, categories, goals, markets
+    const [skillsRes, catsRes, goalsRes, marketsRes] = await Promise.all([
+      userData.selectedSkillIds.length > 0
+        ? supabase.from('skills').select('name').in('id', userData.selectedSkillIds)
+        : Promise.resolve({ data: [] }),
+      userData.selectedCategoryIds.length > 0
+        ? supabase.from('categories').select('name').in('id', userData.selectedCategoryIds)
+        : Promise.resolve({ data: [] }),
+      userData.selectedGoalIds.length > 0
+        ? supabase.from('goals').select('title').in('id', userData.selectedGoalIds)
+        : Promise.resolve({ data: [] }),
+      userData.selectedMarketIds.length > 0
+        ? supabase.from('markets').select('name').in('id', userData.selectedMarketIds)
+        : Promise.resolve({ data: [] }),
+    ]);
+
+    const userContext: UserPersonalizationContext = {
       experienceLevel: userData.preferences?.experience_level,
       budgetBracket: userData.preferences?.budget_bracket,
       availableTime: userData.preferences?.available_time,
+      targetMarket: userData.preferences?.target_audience_focus || undefined,
+      skills: (skillsRes.data || []).map((s: any) => s.name),
+      interests: (catsRes.data || []).map((c: any) => c.name),
+      goals: (goalsRes.data || []).map((g: any) => g.title),
+      markets: (marketsRes.data || []).map((m: any) => m.name),
+      personaArchetype: parsedInput.personaArchetype || 'bootstrapper',
     };
 
     // 3. Ensure Conversation exists
     let conversationId = parsedInput.conversationId;
+    let conversationTitle: string | undefined;
     if (!conversationId) {
+      conversationTitle = parsedInput.message.slice(0, 50);
       const { data: conv, error: convErr } = await supabase
         .from('ai_conversations')
         .insert({
           user_id: userId,
-          title: parsedInput.message.slice(0, 50),
+          title: conversationTitle,
           context_type: 'GENERATION',
         })
-        .select('id')
+        .select('id, title')
         .single();
 
       if (convErr) throw new Error(convErr.message);
       conversationId = conv.id;
+      conversationTitle = conv.title;
+    } else {
+      await supabase
+        .from('ai_conversations')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', conversationId);
     }
 
     // 4. Save User message to DB
@@ -65,11 +104,15 @@ export const sendMessageAndGenerateAction = authActionClient
       content: parsedInput.message,
     });
 
-    // 5. Generate AI Chat & Structured Idea
+    // 5. Generate AI Chat & Structured Idea with selected provider/model
     const messages = [...parsedInput.history, { role: 'user' as const, content: parsedInput.message }];
-    const result = await generateChatResponse(messages, userContext);
+    const result = await generateChatResponse(messages, userContext, {
+      provider: parsedInput.provider,
+      modelId: parsedInput.modelId,
+      customApiKey: parsedInput.customApiKey,
+    });
 
-    // 6. Save Assistant message to DB
+    // 6. Save Assistant message to DB with telemetry
     await supabase.from('ai_messages').insert({
       conversation_id: conversationId,
       role: 'assistant',
@@ -77,7 +120,11 @@ export const sendMessageAndGenerateAction = authActionClient
       input_tokens: result.inputTokens,
       output_tokens: result.outputTokens,
       latency_ms: result.latencyMs,
-      metadata: (result.suggestedIdea ? { suggestedIdea: result.suggestedIdea } : {}) as any,
+      metadata: {
+        model: result.model,
+        provider: result.provider,
+        ...(result.suggestedIdea ? { suggestedIdea: result.suggestedIdea } : {}),
+      } as any,
     });
 
     // 7. If structured idea generated, log to idea_generations
@@ -96,8 +143,14 @@ export const sendMessageAndGenerateAction = authActionClient
 
     return {
       conversationId,
+      conversationTitle,
       reply: result.reply,
       suggestedIdea: result.suggestedIdea,
+      model: result.model,
+      provider: result.provider,
+      latencyMs: result.latencyMs,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
     };
   });
 
@@ -112,6 +165,14 @@ export const saveAIGeneratedIdeaAction = authActionClient
     const supabase = await createSupabaseClient();
     const userId = ctx.userId;
     const { idea, conversationId } = parsedInput;
+
+    const rateLimit = checkRateLimit(`rate_limit:save_ai_idea:${userId}`, {
+      maxRequests: 20,
+      windowMs: 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      throw new Error(`Rate limit exceeded for saving AI ideas. Please wait ${rateLimit.retryAfterSec || 30}s.`);
+    }
 
     // Find category ID matching categorySlug if exists
     let categoryId: string | null = null;
@@ -181,4 +242,114 @@ export const saveAIGeneratedIdeaAction = authActionClient
     revalidatePath('/dashboard');
 
     return newIdea;
+  });
+
+// -----------------------------------------------------------------------------
+// Conversation History Management
+// -----------------------------------------------------------------------------
+
+export async function getUserConversations(userId: string) {
+  const supabase = await createSupabaseClient();
+  const { data, error } = await supabase
+    .from('ai_conversations')
+    .select('id, title, context_type, created_at, updated_at')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching user conversations:', error);
+    return [];
+  }
+  return data || [];
+}
+
+export const getConversationMessagesAction = authActionClient
+  .schema(z.object({ conversationId: z.string().uuid() }))
+  .action(async ({ parsedInput, ctx }) => {
+    const supabase = await createSupabaseClient();
+    const userId = ctx.userId;
+
+    const { data: conv, error: convErr } = await supabase
+      .from('ai_conversations')
+      .select('id, title')
+      .eq('id', parsedInput.conversationId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (convErr || !conv) {
+      throw new Error('Conversation not found or access denied.');
+    }
+
+    const { data: messages, error: msgErr } = await supabase
+      .from('ai_messages')
+      .select('id, role, content, metadata, created_at')
+      .eq('conversation_id', parsedInput.conversationId)
+      .order('created_at', { ascending: true });
+
+    if (msgErr) {
+      throw new Error(msgErr.message);
+    }
+
+    return {
+      conversation: conv,
+      messages: (messages || []).map((m) => ({
+        id: m.id,
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+        suggestedIdea: (m.metadata as any)?.suggestedIdea || null,
+      })),
+    };
+  });
+
+export const deleteConversationAction = authActionClient
+  .schema(z.object({ conversationId: z.string().uuid() }))
+  .action(async ({ parsedInput, ctx }) => {
+    const supabase = await createSupabaseClient();
+    const userId = ctx.userId;
+
+    await supabase
+      .from('ai_messages')
+      .delete()
+      .eq('conversation_id', parsedInput.conversationId);
+
+    const { error } = await supabase
+      .from('ai_conversations')
+      .delete()
+      .eq('id', parsedInput.conversationId)
+      .eq('user_id', userId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    revalidatePath('/ai');
+    return { success: true };
+  });
+
+export const renameConversationAction = authActionClient
+  .schema(
+    z.object({
+      conversationId: z.string().uuid(),
+      title: z.string().min(1).max(100),
+    })
+  )
+  .action(async ({ parsedInput, ctx }) => {
+    const supabase = await createSupabaseClient();
+    const userId = ctx.userId;
+
+    const { error } = await supabase
+      .from('ai_conversations')
+      .update({
+        title: parsedInput.title,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', parsedInput.conversationId)
+      .eq('user_id', userId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    revalidatePath('/ai');
+    return { success: true };
   });

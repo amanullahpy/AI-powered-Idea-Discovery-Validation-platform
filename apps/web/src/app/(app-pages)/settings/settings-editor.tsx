@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { updateProfileAction } from '@/data/user/profile';
 import {
   saveOnboardingAction,
@@ -16,7 +17,7 @@ import {
   type BudgetBracket,
 } from '@/data/user/onboarding';
 import { toast } from 'sonner';
-import { Check, CheckCircle2, User, Sliders, Shield } from 'lucide-react';
+import { Check, User, Sliders, Shield, ArrowRight } from 'lucide-react';
 
 interface SettingsEditorProps {
   userEmail: string;
@@ -108,10 +109,14 @@ export function SettingsEditor({
     });
   }
 
+  const userInitials = (displayName || userEmail)
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <div className="w-full max-w-4xl space-y-6">
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsList className="grid w-full grid-cols-3 max-w-sm">
           <TabsTrigger value="profile" className="flex items-center gap-1.5 text-xs">
             <User className="size-3.5" />
             Profile
@@ -128,47 +133,72 @@ export function SettingsEditor({
 
         {/* Tab 1: Profile Settings */}
         <TabsContent value="profile" className="mt-4">
-          <Card>
+          <Card className="border shadow-xs rounded-2xl">
             <form onSubmit={handleSaveProfile}>
-              <CardHeader>
-                <CardTitle className="text-lg">Public Profile</CardTitle>
-                <CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-bold">Public Profile</CardTitle>
+                <CardDescription className="text-xs">
                   This information will be displayed on ideas you publish publicly.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="displayName">Display Name</Label>
-                  <Input
-                    id="displayName"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Jane Doe"
-                    required
-                  />
+
+              <CardContent className="space-y-6">
+                {/* User Avatar & Summary Card */}
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/40 border">
+                  <Avatar className="size-14 border-2 border-primary/20 bg-primary/10">
+                    <AvatarFallback className="text-base font-bold bg-primary/10 text-primary">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-sm text-foreground">{displayName || 'Anonymous Builder'}</h3>
+                    <p className="text-xs text-muted-foreground">{userEmail}</p>
+                    <Badge variant="outline" className="text-[10px] uppercase tracking-wider font-semibold mt-1">
+                      Active Account
+                    </Badge>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="janedoe"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="displayName" className="text-xs font-semibold">Display Name</Label>
+                    <Input
+                      id="displayName"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder="Jane Doe"
+                      required
+                      className="text-xs h-9 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="username" className="text-xs font-semibold">Username</Label>
+                    <Input
+                      id="username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="janedoe"
+                      className="text-xs h-9 rounded-xl"
+                    />
+                  </div>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio" className="text-xs font-semibold">Bio & Background</Label>
                   <Textarea
                     id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    placeholder="Indie hacker building SaaS & AI tools..."
+                    placeholder="Solo founder building developer tools and AI products..."
                     rows={3}
+                    className="text-xs rounded-xl"
                   />
                 </div>
               </CardContent>
+
               <CardFooter className="border-t pt-4">
-                <Button type="submit" size="sm" disabled={isPending}>
+                <Button type="submit" size="sm" disabled={isPending} className="font-semibold text-xs rounded-xl">
                   {isPending ? 'Saving...' : 'Save Profile Changes'}
                 </Button>
               </CardFooter>
@@ -176,84 +206,148 @@ export function SettingsEditor({
           </Card>
         </TabsContent>
 
-        {/* Tab 2: Personalization Settings */}
-        <TabsContent value="preferences" className="mt-4 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Idea Preferences & Filters</CardTitle>
-              <CardDescription>
-                Tune the criteria our recommendation engine uses to calculate idea match scores.
+        {/* Tab 2: Personalization & Preferences */}
+        <TabsContent value="preferences" className="mt-4">
+          <Card className="border shadow-xs rounded-2xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-bold">Discovery & AI Personalization</CardTitle>
+              <CardDescription className="text-xs">
+                Customize your background constraints to tune idea recommendation algorithms and AI prompt outputs.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Categories */}
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">Interested Categories</Label>
-                <div className="flex flex-wrap gap-2 pt-1">
+              {/* Categories / Interests */}
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Interested Industries & Categories</Label>
+                <div className="flex flex-wrap gap-2">
                   {taxonomy.categories.map((cat) => {
                     const isSelected = selectedCategoryIds.includes(cat.id);
                     return (
-                      <button
+                      <Badge
                         key={cat.id}
-                        type="button"
+                        variant={isSelected ? 'default' : 'outline'}
+                        className="cursor-pointer py-1.5 px-3 text-xs rounded-lg transition-all"
                         onClick={() => toggleItem(selectedCategoryIds, setSelectedCategoryIds, cat.id)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all flex items-center gap-1.5 ${
-                          isSelected
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background hover:bg-accent text-foreground border-border'
-                        }`}
                       >
-                        {isSelected && <Check className="size-3" />}
+                        {isSelected && <Check className="size-3 mr-1" />}
                         {cat.name}
-                      </button>
+                      </Badge>
                     );
                   })}
                 </div>
               </div>
 
               {/* Skills */}
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">Skills & Strengths</Label>
-                <div className="flex flex-wrap gap-2 pt-1">
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Your Skills & Capabilities</Label>
+                <div className="flex flex-wrap gap-2">
                   {taxonomy.skills.map((skill) => {
                     const isSelected = selectedSkillIds.includes(skill.id);
                     return (
-                      <button
+                      <Badge
                         key={skill.id}
-                        type="button"
+                        variant={isSelected ? 'default' : 'outline'}
+                        className="cursor-pointer py-1.5 px-3 text-xs rounded-lg transition-all"
                         onClick={() => toggleItem(selectedSkillIds, setSelectedSkillIds, skill.id)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all flex items-center gap-1.5 ${
-                          isSelected
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background hover:bg-accent text-foreground border-border'
-                        }`}
                       >
-                        {isSelected && <Check className="size-3" />}
+                        {isSelected && <Check className="size-3 mr-1" />}
                         {skill.name}
-                      </button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Goals */}
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Primary Entrepreneurial Goals</Label>
+                <div className="flex flex-wrap gap-2">
+                  {taxonomy.goals.map((g) => {
+                    const isSelected = selectedGoalIds.includes(g.id);
+                    return (
+                      <Badge
+                        key={g.id}
+                        variant={isSelected ? 'default' : 'outline'}
+                        className="cursor-pointer py-1.5 px-3 text-xs rounded-lg transition-all"
+                        onClick={() => toggleItem(selectedGoalIds, setSelectedGoalIds, g.id)}
+                      >
+                        {isSelected && <Check className="size-3 mr-1" />}
+                        {g.title}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Target Markets */}
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Target Geographic & Market Regions</Label>
+                <div className="flex flex-wrap gap-2">
+                  {taxonomy.markets.map((m) => {
+                    const isSelected = selectedMarketIds.includes(m.id);
+                    return (
+                      <Badge
+                        key={m.id}
+                        variant={isSelected ? 'default' : 'outline'}
+                        className="cursor-pointer py-1.5 px-3 text-xs rounded-lg transition-all"
+                        onClick={() => toggleItem(selectedMarketIds, setSelectedMarketIds, m.id)}
+                      >
+                        {isSelected && <Check className="size-3 mr-1" />}
+                        {m.name}
+                      </Badge>
                     );
                   })}
                 </div>
               </div>
 
               {/* Experience Level */}
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">Experience Level</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-                  {(['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'] as ExperienceLevel[]).map((lvl) => {
-                    const isSelected = experienceLevel === lvl;
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Technical / Product Experience</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'] as ExperienceLevel[]).map((level) => {
+                    const isSelected = experienceLevel === level;
                     return (
                       <button
-                        key={lvl}
+                        key={level}
                         type="button"
-                        onClick={() => setExperienceLevel(lvl)}
-                        className={`p-2.5 rounded-lg border text-center text-xs font-medium transition-all ${
+                        onClick={() => setExperienceLevel(level)}
+                        className={`p-2.5 rounded-xl border text-center text-xs font-medium transition-all ${
                           isSelected
-                            ? 'border-primary bg-primary/5 text-primary font-bold'
-                            : 'border-border hover:bg-accent'
+                            ? 'border-primary bg-primary/10 text-primary font-bold shadow-2xs'
+                            : 'border-border hover:bg-accent text-muted-foreground hover:text-foreground'
                         }`}
                       >
-                        {lvl}
+                        {level}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Working Capital Budget */}
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Starting Capital Budget</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    { val: 'ZERO', label: '$0 (Bootstrapped)' },
+                    { val: '1_TO_50', label: '$1 - $50' },
+                    { val: '50_TO_250', label: '$50 - $250' },
+                    { val: '250_TO_1000', label: '$250 - $1,000' },
+                    { val: '1000_PLUS', label: '$1,000+' },
+                  ].map((b) => {
+                    const isSelected = budgetBracket === b.val;
+                    return (
+                      <button
+                        key={b.val}
+                        type="button"
+                        onClick={() => setBudgetBracket(b.val as BudgetBracket)}
+                        className={`p-2.5 rounded-xl border text-center text-xs font-medium transition-all ${
+                          isSelected
+                            ? 'border-primary bg-primary/10 text-primary font-bold shadow-2xs'
+                            : 'border-border hover:bg-accent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        {b.label}
                       </button>
                     );
                   })}
@@ -261,26 +355,26 @@ export function SettingsEditor({
               </div>
 
               {/* Available Time */}
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">Available Time Commitment</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Available Time Commitment</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {[
-                    { value: 'LESS_THAN_1_HR', label: '< 1 hr / day' },
-                    { value: '1_TO_2_HRS', label: '1 - 2 hrs / day' },
-                    { value: '2_TO_4_HRS', label: '2 - 4 hrs / day' },
-                    { value: '4_TO_8_HRS', label: '4 - 8 hrs / day' },
-                    { value: 'FULL_TIME', label: 'Full Time' },
+                    { val: 'LESS_THAN_1_HR', label: '< 1 hour / day' },
+                    { val: '1_TO_2_HRS', label: '1 - 2 hours / day' },
+                    { val: '2_TO_4_HRS', label: '2 - 4 hours / day' },
+                    { val: '4_TO_8_HRS', label: '4 - 8 hours / day' },
+                    { val: 'FULL_TIME', label: 'Full-Time (8+ hrs)' },
                   ].map((t) => {
-                    const isSelected = availableTime === t.value;
+                    const isSelected = availableTime === t.val;
                     return (
                       <button
-                        key={t.value}
+                        key={t.val}
                         type="button"
-                        onClick={() => setAvailableTime(t.value as AvailableTime)}
-                        className={`p-2.5 rounded-lg border text-center text-xs font-medium transition-all ${
+                        onClick={() => setAvailableTime(t.val as AvailableTime)}
+                        className={`p-2.5 rounded-xl border text-center text-xs font-medium transition-all ${
                           isSelected
-                            ? 'border-primary bg-primary/5 text-primary font-bold'
-                            : 'border-border hover:bg-accent'
+                            ? 'border-primary bg-primary/10 text-primary font-bold shadow-2xs'
+                            : 'border-border hover:bg-accent text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         {t.label}
@@ -291,7 +385,7 @@ export function SettingsEditor({
               </div>
             </CardContent>
             <CardFooter className="border-t pt-4">
-              <Button size="sm" onClick={handleSavePreferences} disabled={isPending}>
+              <Button size="sm" onClick={handleSavePreferences} disabled={isPending} className="font-semibold text-xs rounded-xl">
                 {isPending ? 'Updating...' : 'Save Personalization Preferences'}
               </Button>
             </CardFooter>
@@ -300,21 +394,25 @@ export function SettingsEditor({
 
         {/* Tab 3: Account Info */}
         <TabsContent value="account" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Account Security</CardTitle>
-              <CardDescription>
-                Manage your credentials and authentication details.
+          <Card className="border shadow-xs rounded-2xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-bold">Account & Security</CardTitle>
+              <CardDescription className="text-xs">
+                Manage your credentials and security settings.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Email Address</Label>
-                <div className="font-medium text-sm">{userEmail}</div>
+              <div className="p-4 rounded-xl bg-muted/40 border space-y-1">
+                <Label className="text-xs text-muted-foreground">Registered Email Address</Label>
+                <div className="font-semibold text-sm text-foreground">{userEmail}</div>
               </div>
+
               <div className="pt-2">
-                <Button variant="outline" size="sm" asChild>
-                  <a href="/update-password">Update Password</a>
+                <Button variant="outline" size="sm" asChild className="rounded-xl text-xs font-medium">
+                  <a href="/update-password">
+                    Change Password
+                    <ArrowRight className="size-3 ml-1.5" />
+                  </a>
                 </Button>
               </div>
             </CardContent>

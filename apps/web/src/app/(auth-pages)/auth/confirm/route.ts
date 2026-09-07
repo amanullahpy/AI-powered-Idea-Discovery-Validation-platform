@@ -1,3 +1,4 @@
+import { getSafeRedirectUrl } from '@/utils/helpers';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     });
 
     if (!error) {
-      return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url));
+      return NextResponse.redirect(getSafeRedirectUrl(next, req.nextUrl.origin, '/dashboard'));
     }
   }
 

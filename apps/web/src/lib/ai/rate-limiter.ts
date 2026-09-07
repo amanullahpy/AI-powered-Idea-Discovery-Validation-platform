@@ -1,6 +1,6 @@
 /**
- * In-memory sliding-window rate limiter for server actions
- * Can be replaced with Redis/Upstash for multi-instance deployments
+ * Production-ready Sliding-Window Rate Limiter
+ * Includes automatic expired entry pruning to prevent memory leaks in long-running processes
  */
 
 interface RateLimitRecord {
@@ -9,10 +9,28 @@ interface RateLimitRecord {
 }
 
 const userRequestStore = new Map<string, RateLimitRecord>();
+let lastCleanup = Date.now();
+const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 export interface RateLimitConfig {
-  maxRequests: number; // e.g. 10 requests
+  maxRequests: number; // e.g. 15 requests
   windowMs: number;    // e.g. 60000 (1 minute)
+}
+
+/**
+ * Purges expired keys from memory when store exceeds threshold or every 5 minutes
+ */
+function pruneExpiredEntries(now: number) {
+  if (now - lastCleanup < CLEANUP_INTERVAL_MS && userRequestStore.size < 500) {
+    return;
+  }
+
+  for (const [key, record] of userRequestStore.entries()) {
+    if (now > record.resetAt) {
+      userRequestStore.delete(key);
+    }
+  }
+  lastCleanup = now;
 }
 
 export function checkRateLimit(
@@ -20,6 +38,8 @@ export function checkRateLimit(
   config: RateLimitConfig = { maxRequests: 15, windowMs: 60 * 1000 }
 ): { allowed: boolean; remaining: number; retryAfterSec?: number } {
   const now = Date.now();
+  pruneExpiredEntries(now);
+
   const record = userRequestStore.get(key);
 
   if (!record || now > record.resetAt) {

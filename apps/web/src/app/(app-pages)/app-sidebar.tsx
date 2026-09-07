@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { connection } from 'next/server';
 
 import { Brand } from '@/components/brand';
 import {
@@ -33,12 +34,13 @@ async function SidebarHeaderContent() {
 }
 
 async function SidebarContentWrapper() {
+  await connection();
   const { user } = await getCachedLoggedInVerifiedSupabaseUser();
   if (!user) return null;
   return <AppSidebarContent user={user} />;
 }
 
-export async function AppSidebar() {
+export function AppSidebar() {
   return (
     <Sidebar variant="inset" collapsible="icon">
       <SidebarHeaderContent />

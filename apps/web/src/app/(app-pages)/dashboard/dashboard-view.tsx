@@ -16,8 +16,11 @@ import {
   Lightbulb,
   Rocket,
   Search,
+  ShieldCheck,
   Sliders,
   Sparkles,
+  Target,
+  TrendingUp,
   Zap,
 } from 'lucide-react';
 
@@ -58,8 +61,11 @@ export function DashboardView({
 
   function handlePromptSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!promptInput.trim()) return;
-    router.push('/ai');
+    if (!promptInput.trim()) {
+      router.push('/ai');
+      return;
+    }
+    router.push(`/ai?prompt=${encodeURIComponent(promptInput.trim())}`);
   }
 
   return (
@@ -94,8 +100,8 @@ export function DashboardView({
             <Sparkles className="size-4" />
             AI Venture Co-pilot
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
-            What do you want to build, {userName}?
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+            What would you like to build{userName ? `, ${userName}` : ''}?
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
             Describe a market, problem, or project idea. Our AI will analyze customer friction, monetization, and generate an actionable blueprint.
@@ -126,7 +132,7 @@ export function DashboardView({
             <button
               key={idx}
               type="button"
-              onClick={() => router.push('/ai')}
+              onClick={() => router.push(`/ai?prompt=${encodeURIComponent(prompt)}`)}
               className="px-2.5 py-1 rounded-full border bg-background hover:bg-accent text-muted-foreground hover:text-foreground transition-colors text-xs"
             >
               {prompt}
@@ -180,6 +186,63 @@ export function DashboardView({
             <p className="text-[11px] text-muted-foreground mt-0.5">Assisted blueprints</p>
           </div>
         </Card>
+      </div>
+
+      {/* Venture Acceleration Suite */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link
+          href="/trends"
+          className="p-4 rounded-xl border bg-card hover:bg-muted/40 hover:border-primary/40 transition-all space-y-2 group shadow-2xs"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="size-4 text-emerald-500" />
+              <span className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
+                Market Trends Radar
+              </span>
+            </div>
+            <ArrowRight className="size-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Explore fast-growing niches (+240% YoY) and find unsolved customer friction.
+          </p>
+        </Link>
+
+        <Link
+          href="/validation"
+          className="p-4 rounded-xl border bg-card hover:bg-muted/40 hover:border-primary/40 transition-all space-y-2 group shadow-2xs"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Target className="size-4 text-blue-500" />
+              <span className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
+                Validation Experiments
+              </span>
+            </div>
+            <ArrowRight className="size-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Log customer discovery calls, run smoke tests, and measure real willingness-to-pay.
+          </p>
+        </Link>
+
+        <Link
+          href="/competitors"
+          className="p-4 rounded-xl border bg-card hover:bg-muted/40 hover:border-primary/40 transition-all space-y-2 group shadow-2xs"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="size-4 text-amber-500" />
+              <span className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
+                Competitor Moats
+              </span>
+            </div>
+            <ArrowRight className="size-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Deconstruct incumbent weaknesses, pricing gaps, and build your asymmetric moat.
+          </p>
+        </Link>
       </div>
 
       {/* "Ideas Picked For You" Section */}

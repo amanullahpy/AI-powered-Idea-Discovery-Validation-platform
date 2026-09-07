@@ -4,6 +4,7 @@ import { getUserProfile } from '@/data/user/profile';
 import { SettingsEditor } from './settings-editor';
 import { redirect } from 'next/navigation';
 import { siteConfig } from '@/config/site';
+import { connection } from 'next/server';
 
 export const metadata = {
   title: `Settings — ${siteConfig.name}`,
@@ -11,6 +12,7 @@ export const metadata = {
 };
 
 export default async function SettingsPage() {
+  await connection();
   const user = await getCachedLoggedInSupabaseUser();
   if (!user) {
     redirect('/login');

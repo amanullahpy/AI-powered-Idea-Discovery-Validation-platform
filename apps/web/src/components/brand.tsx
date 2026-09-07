@@ -12,22 +12,22 @@ export function IdeaForgeLogo({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="brandBg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#0f172a" />
-          <stop offset="100%" stop-color="#1e1b4b" />
+          <stop offset="0%" stopColor="#0f172a" />
+          <stop offset="100%" stopColor="#1e1b4b" />
         </linearGradient>
         <linearGradient id="brandRing" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#6366f1" />
-          <stop offset="50%" stop-color="#a855f7" />
-          <stop offset="100%" stop-color="#ec4899" />
+          <stop offset="0%" stopColor="#6366f1" />
+          <stop offset="50%" stopColor="#a855f7" />
+          <stop offset="100%" stopColor="#ec4899" />
         </linearGradient>
         <linearGradient id="brandFlame" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#f97316" />
-          <stop offset="50%" stop-color="#fbbf24" />
-          <stop offset="100%" stop-color="#ffffff" />
+          <stop offset="0%" stopColor="#f97316" />
+          <stop offset="50%" stopColor="#fbbf24" />
+          <stop offset="100%" stopColor="#ffffff" />
         </linearGradient>
         <linearGradient id="brandSpark" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#38bdf8" />
-          <stop offset="100%" stop-color="#818cf8" />
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="100%" stopColor="#818cf8" />
         </linearGradient>
       </defs>
       {/* Outer Hexagon / Squircle Container */}

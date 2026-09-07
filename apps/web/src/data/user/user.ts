@@ -5,9 +5,9 @@ import { createSupabaseClient } from "@/supabase-clients/server";
 
 export async function getLoggedInUserId(): Promise<string> {
   const supabase = await createSupabaseClient();
-  const { data, error } = await supabase.auth.getClaims();
-  if (error || !data?.claims?.sub) {
-    throw new Error('User not logged in');
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user?.id) {
+    throw new Error('User not authenticated or session expired');
   }
-  return data.claims.sub;
+  return data.user.id;
 }
