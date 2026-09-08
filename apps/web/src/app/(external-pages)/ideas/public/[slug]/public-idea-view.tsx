@@ -87,7 +87,7 @@ export function PublicIdeaView({
   return (
     <div className="max-w-4xl mx-auto space-y-8 py-8 px-4 sm:px-6">
       {/* Top Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" size="sm" asChild className="-ml-2 text-muted-foreground hover:text-foreground">
           <Link href="/discover">
             <ArrowLeft className="size-4 mr-1.5" />
@@ -95,7 +95,7 @@ export function PublicIdeaView({
           </Link>
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"

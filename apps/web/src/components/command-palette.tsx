@@ -23,7 +23,9 @@ import {
   Sliders,
   Sparkles,
   Sun,
+  Search,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
@@ -60,7 +62,7 @@ export function CommandPalette() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="hidden md:flex items-center gap-2 rounded-lg border bg-muted/30 hover:bg-accent px-2.5 py-1 text-xs text-muted-foreground transition-colors"
+        className="hidden md:flex items-center gap-2 rounded-lg border bg-muted/30 hover:bg-accent px-2.5 py-1 text-xs text-muted-foreground transition-colors shrink-0"
         aria-label="Search and command shortcut"
       >
         <span className="text-[11px]">Quick search...</span>
@@ -68,6 +70,16 @@ export function CommandPalette() {
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setOpen(true)}
+        className="md:hidden size-8 text-muted-foreground hover:text-foreground shrink-0"
+        aria-label="Search and commands"
+      >
+        <Search className="size-4" />
+      </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search sections..." />

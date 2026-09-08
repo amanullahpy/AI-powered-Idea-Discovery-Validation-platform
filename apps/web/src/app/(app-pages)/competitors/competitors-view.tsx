@@ -237,12 +237,12 @@ export function CompetitorsView({ ideas, initialCompetitors = [] }: CompetitorsV
           </div>
 
           {ideas.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground hidden sm:inline">Compare for Idea:</span>
+            <div className="flex items-center gap-2 max-w-full">
+              <span className="text-xs text-muted-foreground hidden sm:inline shrink-0">Compare for Idea:</span>
               <select
                 value={selectedIdeaId}
                 onChange={(e) => setSelectedIdeaId(e.target.value)}
-                className="bg-background border rounded-lg px-3 py-1.5 text-xs text-foreground font-semibold focus:ring-1 focus:ring-primary focus:outline-none"
+                className="bg-background border rounded-lg px-2.5 py-1.5 text-xs text-foreground font-semibold focus:ring-1 focus:ring-primary focus:outline-none max-w-[200px] xs:max-w-[260px] sm:max-w-xs truncate"
               >
                 {ideas.map((idea) => (
                   <option key={idea.id} value={idea.id}>
@@ -294,7 +294,7 @@ export function CompetitorsView({ ideas, initialCompetitors = [] }: CompetitorsV
             {isPending && <span className="ml-2 text-primary animate-pulse">(Updating...)</span>}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button
             size="sm"
             variant="outline"
@@ -444,7 +444,7 @@ export function CompetitorsView({ ideas, initialCompetitors = [] }: CompetitorsV
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {competitors.map((comp) => (
           <Card
             key={comp.id}

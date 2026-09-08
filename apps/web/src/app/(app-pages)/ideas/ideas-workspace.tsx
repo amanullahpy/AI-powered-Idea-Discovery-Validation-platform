@@ -66,8 +66,8 @@ export function IdeasWorkspace({ initialIdeas, savedIdeaIds }: IdeasWorkspacePro
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button asChild size="sm" className="gap-1.5 font-semibold">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild size="sm" className="gap-1.5 font-semibold w-full sm:w-auto">
             <Link href="/ai">
               <Sparkles className="size-3.5" />
               Generate with AI
@@ -121,7 +121,7 @@ export function IdeasWorkspace({ initialIdeas, savedIdeaIds }: IdeasWorkspacePro
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredIdeas.map((idea) => (
                 <IdeaCard
                   key={idea.id}

@@ -117,17 +117,17 @@ export function SettingsEditor({
     <div className="w-full max-w-4xl space-y-6">
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-sm">
-          <TabsTrigger value="profile" className="flex items-center gap-1.5 text-xs">
+          <TabsTrigger value="profile" className="flex items-center gap-1.5 text-xs px-1.5 sm:px-3">
             <User className="size-3.5" />
-            Profile
+            <span className="truncate">Profile</span>
           </TabsTrigger>
-          <TabsTrigger value="preferences" className="flex items-center gap-1.5 text-xs">
+          <TabsTrigger value="preferences" className="flex items-center gap-1.5 text-xs px-1.5 sm:px-3">
             <Sliders className="size-3.5" />
-            Personalization
+            <span className="truncate">Personalization</span>
           </TabsTrigger>
-          <TabsTrigger value="account" className="flex items-center gap-1.5 text-xs">
+          <TabsTrigger value="account" className="flex items-center gap-1.5 text-xs px-1.5 sm:px-3">
             <Shield className="size-3.5" />
-            Account
+            <span className="truncate">Account</span>
           </TabsTrigger>
         </TabsList>
 
@@ -144,7 +144,7 @@ export function SettingsEditor({
 
               <CardContent className="space-y-6">
                 {/* User Avatar & Summary Card */}
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/40 border">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl bg-muted/40 border">
                   <Avatar className="size-14 border-2 border-primary/20 bg-primary/10">
                     <AvatarFallback className="text-base font-bold bg-primary/10 text-primary">
                       {userInitials}
@@ -198,7 +198,7 @@ export function SettingsEditor({
               </CardContent>
 
               <CardFooter className="border-t pt-4">
-                <Button type="submit" size="sm" disabled={isPending} className="font-semibold text-xs rounded-xl">
+                <Button type="submit" size="sm" disabled={isPending} className="font-semibold text-xs rounded-xl w-full sm:w-auto">
                   {isPending ? 'Saving...' : 'Save Profile Changes'}
                 </Button>
               </CardFooter>
@@ -385,7 +385,7 @@ export function SettingsEditor({
               </div>
             </CardContent>
             <CardFooter className="border-t pt-4">
-              <Button size="sm" onClick={handleSavePreferences} disabled={isPending} className="font-semibold text-xs rounded-xl">
+              <Button size="sm" onClick={handleSavePreferences} disabled={isPending} className="font-semibold text-xs rounded-xl w-full sm:w-auto">
                 {isPending ? 'Updating...' : 'Save Personalization Preferences'}
               </Button>
             </CardFooter>

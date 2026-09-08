@@ -157,9 +157,9 @@ export function AIChat({
   const [input, setInput] = useState('');
   const [isPending, startTransition] = useTransition();
 
-  // 3. UI Panels State
-  const [leftSidebarOpen, setLeftSidebarOpen] = useState(true);
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
+  // 3. UI Panels State (responsive default: false on mobile/tablet, right open on xl, left open on lg)
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [rightPanelTab, setRightPanelTab] = useState<'blueprint' | 'radar' | 'profile' | 'saved' | 'templates'>('blueprint');
 
   // 4. Active Blueprint & Interactive States
@@ -177,6 +177,19 @@ export function AIChat({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchParams = useSearchParams();
   const initialPromptProcessed = useRef(false);
+
+  // Responsive panel auto-configuration on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        setLeftSidebarOpen(true);
+      }
+      if (width >= 1280) {
+        setRightSidebarOpen(true);
+      }
+    }
+  }, []);
 
   // Initialize local-first cache on mount
   useEffect(() => {
@@ -233,6 +246,9 @@ export function AIChat({
     } else {
       setMessages([]);
     }
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setLeftSidebarOpen(false);
+    }
 
     // 2. Background sync with DB if needed
     startTransition(async () => {
@@ -270,6 +286,9 @@ export function AIChat({
     setMessages([]);
     setSelectedBlueprint(null);
     setInput('');
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setLeftSidebarOpen(false);
+    }
     toast.info('Started a new conversation.');
   }
 
@@ -522,9 +541,20 @@ ${idea.whyItFits}
       {/* ========================================================================= */}
       {/* 1. LEFT SIDEBAR: Local-First Recent Chats Management */}
       {/* ========================================================================= */}
+      {/* Mobile/Tablet Backdrop for Left Sidebar */}
+      {leftSidebarOpen && (
+        <div
+          onClick={() => setLeftSidebarOpen(false)}
+          className="lg:hidden absolute inset-0 z-30 bg-background/80 backdrop-blur-xs"
+          aria-hidden="true"
+        />
+      )}
+
       <aside
-        className={`border-r bg-card/70 backdrop-blur-xs flex flex-col shrink-0 transition-all duration-300 z-20 ${
-          leftSidebarOpen ? 'w-64 sm:w-72 lg:w-80' : 'w-0 overflow-hidden border-r-0'
+        className={`bg-card/95 backdrop-blur-md flex flex-col shrink-0 transition-all duration-300 z-40 lg:z-20 ${
+          leftSidebarOpen
+            ? 'w-72 sm:w-80 border-r shadow-xl lg:shadow-none absolute lg:static inset-y-0 left-0 top-0 bottom-0 h-full'
+            : 'w-0 overflow-hidden border-r-0 pointer-events-none'
         }`}
       >
         {/* Sidebar Header */}
@@ -539,15 +569,26 @@ ${idea.whyItFits}
                 {conversations.length}
               </Badge>
             </div>
-            <Button
-              size="sm"
-              onClick={handleNewChat}
-              className="h-7 px-2.5 text-xs font-medium gap-1 shadow-2xs"
-              title="Start a new chat"
-            >
-              <Plus className="size-3.5" />
-              <span>New</span>
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                onClick={handleNewChat}
+                className="h-7 px-2.5 text-xs font-medium gap-1 shadow-2xs"
+                title="Start a new chat"
+              >
+                <Plus className="size-3.5" />
+                <span>New</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLeftSidebarOpen(false)}
+                className="lg:hidden size-7 text-muted-foreground hover:text-foreground"
+                title="Close recent chats"
+              >
+                <PanelLeftClose className="size-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Instant Search Bar */}
@@ -689,8 +730,8 @@ ${idea.whyItFits}
       {/* ========================================================================= */}
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-background">
         {/* Top Header */}
-        <header className="h-14 border-b px-4 sm:px-6 flex items-center justify-between shrink-0 bg-background/95 backdrop-blur-xs z-10">
-          <div className="flex items-center gap-2.5 min-w-0">
+        <header className="h-14 border-b px-2.5 sm:px-4 lg:px-6 flex items-center justify-between shrink-0 bg-background/95 backdrop-blur-xs z-10">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             {/* Toggle Left Sidebar */}
             <Button
               variant="ghost"
@@ -713,13 +754,13 @@ ${idea.whyItFits}
             </Avatar>
 
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-foreground truncate max-w-[220px] sm:max-w-md">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground truncate max-w-[110px] xs:max-w-[180px] sm:max-w-xs md:max-w-md">
                   {activeConversationTitle}
                 </h2>
                 <Badge
                   variant="outline"
-                  className="text-[10px] font-normal py-0 h-4 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hidden sm:inline-flex"
+                  className="text-[10px] font-normal py-0 h-4 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hidden sm:inline-flex shrink-0"
                 >
                   Local-First Synced
                 </Badge>
@@ -1080,9 +1121,20 @@ ${idea.whyItFits}
       {/* ========================================================================= */}
       {/* 3. RIGHT SIDEBAR: Venture Studio Suite (Multi-View Pages) */}
       {/* ========================================================================= */}
+      {/* Mobile/Tablet/Small-Desktop Backdrop for Right Sidebar */}
+      {rightSidebarOpen && (
+        <div
+          onClick={() => setRightSidebarOpen(false)}
+          className="xl:hidden absolute inset-0 z-30 bg-background/80 backdrop-blur-xs"
+          aria-hidden="true"
+        />
+      )}
+
       <aside
-        className={`border-l bg-card/60 backdrop-blur-xs flex flex-col shrink-0 transition-all duration-300 z-20 ${
-          rightSidebarOpen ? 'w-80 sm:w-96' : 'w-0 overflow-hidden border-l-0'
+        className={`bg-card/95 backdrop-blur-md flex flex-col shrink-0 transition-all duration-300 z-40 xl:z-20 ${
+          rightSidebarOpen
+            ? 'w-[min(26rem,92vw)] border-l shadow-xl xl:shadow-none absolute xl:static inset-y-0 right-0 top-0 bottom-0 h-full'
+            : 'w-0 overflow-hidden border-l-0 pointer-events-none'
         }`}
       >
         {/* Right Header */}
@@ -1111,19 +1163,19 @@ ${idea.whyItFits}
           >
             <div className="px-3 pt-2 shrink-0">
               <TabsList className="grid grid-cols-5 w-full h-8 text-[10px] p-0.5">
-                <TabsTrigger value="blueprint" className="px-1 text-[10px]">
+                <TabsTrigger value="blueprint" className="px-1 text-[9px] sm:text-[10px] truncate">
                   Blueprint
                 </TabsTrigger>
-                <TabsTrigger value="radar" className="px-1 text-[10px]">
+                <TabsTrigger value="radar" className="px-1 text-[9px] sm:text-[10px] truncate">
                   Radar
                 </TabsTrigger>
-                <TabsTrigger value="profile" className="px-1 text-[10px]">
+                <TabsTrigger value="profile" className="px-1 text-[9px] sm:text-[10px] truncate">
                   Profile
                 </TabsTrigger>
-                <TabsTrigger value="saved" className="px-1 text-[10px]">
+                <TabsTrigger value="saved" className="px-1 text-[9px] sm:text-[10px] truncate">
                   Saved
                 </TabsTrigger>
-                <TabsTrigger value="templates" className="px-1 text-[10px]">
+                <TabsTrigger value="templates" className="px-1 text-[9px] sm:text-[10px] truncate">
                   Prompts
                 </TabsTrigger>
               </TabsList>

@@ -101,7 +101,7 @@ export function DiscoverView({
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant={sortBy === 'recommended' ? 'secondary' : 'ghost'}
             size="sm"
@@ -167,7 +167,7 @@ export function DiscoverView({
       </div>
 
       {/* Difficulty Quick Filters */}
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider mr-1">
           Difficulty:
         </span>
@@ -213,7 +213,7 @@ export function DiscoverView({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredIdeas.map((idea) => (
             <IdeaCard
               key={idea.id}

@@ -119,7 +119,7 @@ export function DashboardView({
               className="pl-10 h-11 text-sm bg-background"
             />
           </div>
-          <Button type="submit" className="h-11 px-6 font-semibold gap-2 shrink-0">
+          <Button type="submit" className="h-11 px-6 font-semibold gap-2 shrink-0 w-full sm:w-auto">
             <Sparkles className="size-4" />
             Launch AI Chat
           </Button>
@@ -247,7 +247,7 @@ export function DashboardView({
 
       {/* "Ideas Picked For You" Section */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
               <Sparkles className="size-5 text-primary" />
@@ -265,7 +265,7 @@ export function DashboardView({
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {scoredIdeas.slice(0, 6).map((idea) => (
             <IdeaCard
               key={idea.id}
@@ -286,7 +286,7 @@ export function DashboardView({
             Update your interested categories, skills, or available hours to surface different opportunities.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
           <Button variant="outline" size="sm" asChild className="text-xs">
             <Link href="/settings">
               <Sliders className="size-3.5 mr-1.5" />

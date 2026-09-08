@@ -132,8 +132,8 @@ export function IdeaCard({
     <Card className="flex flex-col justify-between border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md hover:border-border/80">
       <CardHeader className="space-y-2 p-5 pb-3">
         {/* Top Badges & Actions */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 min-w-0">
             {idea.categories && (
               <Badge variant="secondary" className="text-xs font-semibold">
                 {idea.categories.name}
@@ -242,8 +242,8 @@ export function IdeaCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t p-4 px-5 mt-4 bg-muted/20">
-        <div className="flex items-center gap-1">
+      <CardFooter className="flex flex-wrap items-center justify-between gap-2 border-t p-4 px-5 mt-4 bg-muted/20">
+        <div className="flex flex-wrap items-center gap-1">
           {showSaveButton && (
             <Button
               variant="ghost"

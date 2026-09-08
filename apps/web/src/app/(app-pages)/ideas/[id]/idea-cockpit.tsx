@@ -110,7 +110,7 @@ export function IdeaCockpit({ idea }: IdeaCockpitProps) {
           </Link>
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Visibility Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -228,14 +228,14 @@ export function IdeaCockpit({ idea }: IdeaCockpitProps) {
 
       {/* Cockpit Tabs */}
       <Tabs defaultValue="blueprint" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
-          <TabsTrigger value="blueprint" className="text-xs">
+        <TabsList className="flex flex-wrap h-auto w-full max-w-xl p-1 gap-1">
+          <TabsTrigger value="blueprint" className="flex-1 sm:flex-initial text-xs py-1.5 px-3">
             Blueprint & MVP
           </TabsTrigger>
-          <TabsTrigger value="monetization" className="text-xs">
+          <TabsTrigger value="monetization" className="flex-1 sm:flex-initial text-xs py-1.5 px-3">
             Audience & Revenue
           </TabsTrigger>
-          <TabsTrigger value="validation" className="text-xs">
+          <TabsTrigger value="validation" className="flex-1 sm:flex-initial text-xs py-1.5 px-3">
             Validation & Roadmap
           </TabsTrigger>
         </TabsList>

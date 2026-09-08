@@ -154,8 +154,8 @@ export function TrendsView({ initialTrends, initialBookmarkedIds }: TrendsViewPr
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="pt-2 flex flex-col sm:flex-row gap-3 items-center justify-between">
-          <div className="relative w-full sm:w-80">
+        <div className="pt-2 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+          <div className="relative w-full md:w-80 shrink-0">
             <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="Filter by keyword, pain point..."
@@ -165,7 +165,7 @@ export function TrendsView({ initialTrends, initialBookmarkedIds }: TrendsViewPr
             />
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 scrollbar-none">
+          <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 scrollbar-none">
             {CATEGORIES.map((cat) => (
               <Button
                 key={cat}

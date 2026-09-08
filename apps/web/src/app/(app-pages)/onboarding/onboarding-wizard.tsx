@@ -413,28 +413,29 @@ export function OnboardingWizard({
           )}
         </CardContent>
 
-        <CardFooter className="flex items-center justify-between border-t pt-4">
+        <CardFooter className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t pt-4">
           <Button
             variant="outline"
             size="sm"
             onClick={handleBack}
             disabled={currentStep === 1 || isPending}
+            className="w-full sm:w-auto"
           >
             <ArrowLeft className="size-4 mr-1.5" />
             Back
           </Button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleNext(true)}
               disabled={isPending}
-              className="text-muted-foreground"
+              className="text-muted-foreground w-full sm:w-auto text-xs"
             >
               Skip this question
             </Button>
-            <Button size="sm" onClick={() => handleNext(false)} disabled={isPending}>
+            <Button size="sm" onClick={() => handleNext(false)} disabled={isPending} className="w-full sm:w-auto">
               {currentStep === STEPS.length ? (
                 <>
                   <CheckCircle2 className="size-4 mr-1.5" />

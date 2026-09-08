@@ -41,6 +41,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { signOutAction } from '@/data/auth/sign-out';
 
@@ -66,6 +67,13 @@ const systemNavigation = [
 export function AppSidebarContent({ user }: { user: User }) {
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   function handleSignOut() {
     startTransition(async () => {
@@ -93,7 +101,7 @@ export function AppSidebarContent({ user }: { user: User }) {
         <SidebarGroup>
           <SidebarGroupLabel>Idea Discovery</SidebarGroupLabel>
           <SidebarGroupAction asChild title="New AI Idea">
-            <Link href="/ai">
+            <Link href="/ai" onClick={handleNavClick}>
               <Plus aria-hidden="true" />
               <span className="sr-only">New AI Idea</span>
             </Link>
@@ -106,7 +114,7 @@ export function AppSidebarContent({ user }: { user: User }) {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleNavClick}>
                         <Icon aria-hidden="true" />
                         <span>{item.title}</span>
                       </Link>
@@ -129,7 +137,7 @@ export function AppSidebarContent({ user }: { user: User }) {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleNavClick}>
                         <Icon aria-hidden="true" />
                         <span>{item.title}</span>
                       </Link>
@@ -152,7 +160,7 @@ export function AppSidebarContent({ user }: { user: User }) {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleNavClick}>
                         <Icon aria-hidden="true" />
                         <span>{item.title}</span>
                       </Link>

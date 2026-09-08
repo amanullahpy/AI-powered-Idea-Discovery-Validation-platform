@@ -42,7 +42,7 @@ export default async function IdeaDetailPage({ params }: IdeaDetailPageProps) {
   }
 
   return (
-    <div className="p-6 md:p-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <IdeaCockpit idea={idea} />
     </div>
   );

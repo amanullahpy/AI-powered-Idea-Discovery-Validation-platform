@@ -203,12 +203,12 @@ export function ValidationMatrixView({
 
           {/* Idea Selector Dropdown */}
           {ideas.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground hidden sm:inline">Active Idea:</span>
+            <div className="flex items-center gap-2 max-w-full">
+              <span className="text-xs text-muted-foreground hidden sm:inline shrink-0">Active Idea:</span>
               <select
                 value={selectedIdeaId}
                 onChange={(e) => setSelectedIdeaId(e.target.value)}
-                className="bg-background border rounded-lg px-3 py-1.5 text-xs text-foreground font-semibold focus:ring-1 focus:ring-primary focus:outline-none"
+                className="bg-background border rounded-lg px-2.5 py-1.5 text-xs text-foreground font-semibold focus:ring-1 focus:ring-primary focus:outline-none max-w-[200px] xs:max-w-[260px] sm:max-w-xs truncate"
               >
                 {ideas.map((idea) => (
                   <option key={idea.id} value={idea.id}>
@@ -233,7 +233,7 @@ export function ValidationMatrixView({
         {/* Readiness Bar */}
         <div className="pt-2 max-w-xl space-y-2">
           <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 flex-wrap">
               <span>Overall Validation Readiness</span>
               <Badge
                 variant="outline"
@@ -255,25 +255,25 @@ export function ValidationMatrixView({
       {selectedIdea ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LEFT 2 COLS: Interviews & Experiments */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             <Tabs defaultValue="interviews" className="space-y-4">
-              <div className="flex items-center justify-between">
-                <TabsList className="h-9">
-                  <TabsTrigger value="interviews" className="text-xs gap-1.5">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <TabsList className="h-9 w-full sm:w-auto p-0.5">
+                  <TabsTrigger value="interviews" className="flex-1 sm:flex-initial text-xs gap-1.5 px-2 sm:px-3">
                     <Users className="size-3.5" />
-                    <span>Customer Interviews ({interviews.length})</span>
+                    <span>Interviews ({interviews.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="experiments" className="text-xs gap-1.5">
+                  <TabsTrigger value="experiments" className="flex-1 sm:flex-initial text-xs gap-1.5 px-2 sm:px-3">
                     <Zap className="size-3.5" />
                     <span>Smoke Tests ({experiments.length})</span>
                   </TabsTrigger>
                 </TabsList>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 self-stretch sm:self-auto">
                   <Button
                     size="sm"
                     onClick={() => setShowInterviewForm(!showInterviewForm)}
-                    className="h-8 text-xs font-semibold gap-1.5 shadow-2xs"
+                    className="flex-1 sm:flex-initial h-8 text-xs font-semibold gap-1.5 shadow-2xs"
                   >
                     <Plus className="size-3.5" />
                     <span>Log Interview</span>
@@ -282,7 +282,7 @@ export function ValidationMatrixView({
                     size="sm"
                     variant="outline"
                     onClick={() => setShowExpForm(!showExpForm)}
-                    className="h-8 text-xs font-semibold gap-1.5"
+                    className="flex-1 sm:flex-initial h-8 text-xs font-semibold gap-1.5"
                   >
                     <Plus className="size-3.5" />
                     <span>New Test</span>
@@ -522,14 +522,14 @@ export function ValidationMatrixView({
                         "{item.key_quote}"
                       </blockquote>
 
-                      <div className="flex items-center justify-between text-[11px] pt-1 border-t text-muted-foreground">
+                      <div className="flex items-center justify-between flex-wrap gap-2 text-[11px] pt-1 border-t text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <AlertCircle className="size-3 text-amber-500" />
-                          Pain Severity: <strong className="text-foreground">{item.pain_score} / 10</strong>
+                          <AlertCircle className="size-3 text-amber-500 shrink-0" />
+                          <span>Pain Severity: <strong className="text-foreground">{item.pain_score} / 10</strong></span>
                         </span>
                         <span className="flex items-center gap-1">
-                          <Coins className="size-3 text-emerald-500" />
-                          Validated WTP: <strong className="text-foreground">{item.willingness_to_pay || 'Unspecified'}</strong>
+                          <Coins className="size-3 text-emerald-500 shrink-0" />
+                          <span>Validated WTP: <strong className="text-foreground">{item.willingness_to_pay || 'Unspecified'}</strong></span>
                         </span>
                       </div>
                     </Card>

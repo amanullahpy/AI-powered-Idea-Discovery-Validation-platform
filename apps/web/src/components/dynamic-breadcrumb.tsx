@@ -43,13 +43,13 @@ export function DynamicBreadcrumb() {
     }
 
     return (
-        <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
+        <Breadcrumb className="min-w-0">
+            <BreadcrumbList className="flex-nowrap overflow-hidden">
+                <BreadcrumbItem className="shrink-0">
                     <BreadcrumbLink asChild>
                         <Link href="/dashboard" className="flex items-center gap-1">
-                            <Home className="h-3.5 w-3.5" />
-                            <span>Home</span>
+                            <Home className="h-3.5 w-3.5 shrink-0" />
+                            <span className="hidden sm:inline">Home</span>
                         </Link>
                     </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -66,13 +66,15 @@ export function DynamicBreadcrumb() {
                     if (isUUID && !isLast) return null;
 
                     return (
-                        <div key={segment + index} className="flex items-center gap-1">
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
+                        <div key={segment + index} className="flex items-center gap-1 min-w-0">
+                            <BreadcrumbSeparator className="shrink-0" />
+                            <BreadcrumbItem className="min-w-0">
                                 {isLast ? (
-                                    <BreadcrumbPage>{isUUID ? 'Details' : label}</BreadcrumbPage>
+                                    <BreadcrumbPage className="truncate max-w-[110px] sm:max-w-[200px] md:max-w-none font-medium">
+                                        {isUUID ? 'Details' : label}
+                                    </BreadcrumbPage>
                                 ) : (
-                                    <BreadcrumbLink asChild>
+                                    <BreadcrumbLink asChild className="truncate max-w-[80px] sm:max-w-none">
                                         <Link href={href}>{label}</Link>
                                     </BreadcrumbLink>
                                 )}

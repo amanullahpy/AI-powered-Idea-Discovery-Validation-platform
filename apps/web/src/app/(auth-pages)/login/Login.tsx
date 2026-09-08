@@ -130,9 +130,9 @@ export function Login({ next }: { next?: string }) {
     >
       <Tabs defaultValue="password">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="password">Password</TabsTrigger>
-          <TabsTrigger value="magic-link">Magic Link</TabsTrigger>
-          <TabsTrigger value="social-login">Social</TabsTrigger>
+          <TabsTrigger value="password" className="text-xs sm:text-sm px-1.5 sm:px-3">Password</TabsTrigger>
+          <TabsTrigger value="magic-link" className="text-xs sm:text-sm px-1.5 sm:px-3">Magic Link</TabsTrigger>
+          <TabsTrigger value="social-login" className="text-xs sm:text-sm px-1.5 sm:px-3">Social</TabsTrigger>
         </TabsList>
         <TabsContent value="password" className="mt-6">
           <EmailAndPassword
