@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { IdeaCard, type IdeaItem } from '@/components/ideas/idea-card';
 import {
@@ -14,7 +14,7 @@ import {
   Compass,
   Hammer,
   Lightbulb,
-  Rocket,
+  Presentation,
   Search,
   ShieldCheck,
   Sliders,
@@ -111,16 +111,18 @@ export function DashboardView({
         {/* Search / AI Launch Form */}
         <form onSubmit={handlePromptSubmit} className="flex flex-col sm:flex-row gap-2 max-w-2xl">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" aria-hidden="true" />
             <Input
               value={promptInput}
               onChange={(e) => setPromptInput(e.target.value)}
-              placeholder="Tell me what you're looking for (e.g. 'SaaS tool for freelance designers')..."
+              placeholder="Tell me what you're looking for (e.g. 'SaaS tool for freelance designers')…"
+              aria-label="Idea discovery search query or AI prompt"
+              spellCheck={false}
               className="pl-10 h-11 text-sm bg-background"
             />
           </div>
           <Button type="submit" className="h-11 px-6 font-semibold gap-2 shrink-0 w-full sm:w-auto">
-            <Sparkles className="size-4" />
+            <Sparkles className="size-4" aria-hidden="true" />
             Launch AI Chat
           </Button>
         </form>
@@ -143,53 +145,65 @@ export function DashboardView({
 
       {/* Quick Metrics Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5 flex flex-col justify-between">
+        <Link
+          href="/ideas"
+          className="p-5 flex flex-col justify-between rounded-xl border bg-card text-card-foreground shadow-2xs hover:border-primary/40 hover:bg-muted/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-medium">My Ideas</span>
-            <Lightbulb className="size-4 text-primary" />
+            <Lightbulb className="size-4 text-primary" aria-hidden="true" />
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-extrabold">{userStats.totalIdeas}</div>
+            <div className="text-2xl font-extrabold tabular-nums">{userStats.totalIdeas}</div>
             <p className="text-[11px] text-muted-foreground mt-0.5">Created or generated</p>
           </div>
-        </Card>
+        </Link>
 
-        <Card className="p-5 flex flex-col justify-between">
+        <Link
+          href="/saved"
+          className="p-5 flex flex-col justify-between rounded-xl border bg-card text-card-foreground shadow-2xs hover:border-amber-500/40 hover:bg-muted/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-medium">Saved Bookmarks</span>
-            <Bookmark className="size-4 text-amber-500" />
+            <Bookmark className="size-4 text-amber-500" aria-hidden="true" />
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-extrabold">{userStats.savedIdeas}</div>
+            <div className="text-2xl font-extrabold tabular-nums">{userStats.savedIdeas}</div>
             <p className="text-[11px] text-muted-foreground mt-0.5">Bookmarked for later</p>
           </div>
-        </Card>
+        </Link>
 
-        <Card className="p-5 flex flex-col justify-between">
+        <Link
+          href="/ideas?status=BUILDING"
+          className="p-5 flex flex-col justify-between rounded-xl border bg-card text-card-foreground shadow-2xs hover:border-emerald-500/40 hover:bg-muted/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-medium">In Building</span>
-            <Hammer className="size-4 text-emerald-500" />
+            <Hammer className="size-4 text-emerald-500" aria-hidden="true" />
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-extrabold">{userStats.buildingIdeas}</div>
+            <div className="text-2xl font-extrabold tabular-nums">{userStats.buildingIdeas}</div>
             <p className="text-[11px] text-muted-foreground mt-0.5">Active projects</p>
           </div>
-        </Card>
+        </Link>
 
-        <Card className="p-5 flex flex-col justify-between">
+        <Link
+          href="/ai"
+          className="p-5 flex flex-col justify-between rounded-xl border bg-card text-card-foreground shadow-2xs hover:border-purple-500/40 hover:bg-muted/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs font-medium">AI Syntheses</span>
-            <Zap className="size-4 text-purple-500" />
+            <Zap className="size-4 text-purple-500" aria-hidden="true" />
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-extrabold">{userStats.aiIdeas}</div>
+            <div className="text-2xl font-extrabold tabular-nums">{userStats.aiIdeas}</div>
             <p className="text-[11px] text-muted-foreground mt-0.5">Assisted blueprints</p>
           </div>
-        </Card>
+        </Link>
       </div>
 
       {/* Venture Acceleration Suite */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link
           href="/trends"
           className="p-4 rounded-xl border bg-card hover:bg-muted/40 hover:border-primary/40 transition-all space-y-2 group shadow-2xs"
@@ -241,6 +255,24 @@ export function DashboardView({
           </div>
           <p className="text-xs text-muted-foreground">
             Deconstruct incumbent weaknesses, pricing gaps, and build your asymmetric moat.
+          </p>
+        </Link>
+
+        <Link
+          href="/pitch"
+          className="p-4 rounded-xl border bg-card hover:bg-muted/40 hover:border-primary/40 transition-all space-y-2 group shadow-2xs"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Presentation className="size-4 text-purple-500" />
+              <span className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">
+                Pitch Studio & Memo
+              </span>
+            </div>
+            <ArrowRight className="size-3.5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Generate 10-slide VC pitch decks, unit economics models, and 1-page investment memos.
           </p>
         </Link>
       </div>

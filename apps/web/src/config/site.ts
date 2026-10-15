@@ -5,16 +5,28 @@
  * navigation, and social links across the entire application.
  */
 
+import { clientEnv } from './env';
+import { DEFAULT_SITE_URL, PRODUCT_NAME } from '@/constants';
+
 export const siteConfig = {
   // Brand Identity
-  name: 'IdeaForge',
-  shortName: 'IdeaForge',
+  name: PRODUCT_NAME,
+  shortName: PRODUCT_NAME,
   tagline: 'AI-Powered Idea Discovery & Validation',
   description:
     'Discover high-conviction startup, SaaS, AI agent, and side hustle concepts tailored to your skills, budget, and timeline. Validate market demand, audit competitors, and build your MVP faster.',
 
   // Domain & URLs
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  url: (() => {
+    const configured =
+      clientEnv.NEXT_PUBLIC_SITE_URL ||
+      (clientEnv.NEXT_PUBLIC_VERCEL_URL
+        ? 'https://' + clientEnv.NEXT_PUBLIC_VERCEL_URL
+        : DEFAULT_SITE_URL);
+    return configured.startsWith('http://') || configured.startsWith('https://')
+      ? configured
+      : 'https://' + configured;
+  })(),
   ogImage: '/logos/ideaforge-logo.svg',
 
   // Author & Contact

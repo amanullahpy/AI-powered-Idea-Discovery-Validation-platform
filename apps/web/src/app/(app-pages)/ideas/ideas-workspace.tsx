@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { IdeaCard, type IdeaItem } from '@/components/ideas/idea-card';
-import { Lightbulb, Plus, Search, Sparkles } from 'lucide-react';
+import { Lightbulb, Search, Sparkles } from 'lucide-react';
 
 interface IdeasWorkspaceProps {
   initialIdeas: IdeaItem[];

@@ -61,13 +61,14 @@ export function CommandPalette() {
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
         className="hidden md:flex items-center gap-2 rounded-lg border bg-muted/30 hover:bg-accent px-2.5 py-1 text-xs text-muted-foreground transition-colors shrink-0"
         aria-label="Search and command shortcut"
       >
-        <span className="text-[11px]">Quick search...</span>
-        <kbd className="pointer-events-none inline-flex h-4.5 select-none items-center gap-0.5 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground shadow-2xs">
-          <span className="text-xs">⌘</span>K
+        <span className="text-[11px]">Quick search…</span>
+        <kbd className="pointer-events-none inline-flex h-4.5 select-none items-center rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground shadow-2xs">
+          <span className="text-xs">⌘</span>{'\u00A0'}K
         </kbd>
       </button>
 
@@ -75,14 +76,14 @@ export function CommandPalette() {
         variant="ghost"
         size="icon"
         onClick={() => setOpen(true)}
-        className="md:hidden size-8 text-muted-foreground hover:text-foreground shrink-0"
+        className="md:hidden size-11 min-h-[44px] min-w-[44px] text-muted-foreground hover:text-foreground shrink-0"
         aria-label="Search and commands"
       >
-        <Search className="size-4" />
+        <Search className="size-4" aria-hidden="true" />
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search sections..." />
+        <CommandInput placeholder="Type a command or search sections…" />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
 

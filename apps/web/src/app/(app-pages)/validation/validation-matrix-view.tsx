@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useTransition } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -204,8 +204,10 @@ export function ValidationMatrixView({
           {/* Idea Selector Dropdown */}
           {ideas.length > 0 && (
             <div className="flex items-center gap-2 max-w-full">
-              <span className="text-xs text-muted-foreground hidden sm:inline shrink-0">Active Idea:</span>
+              <label htmlFor="validation-idea-select" className="text-xs text-muted-foreground hidden sm:inline shrink-0">Active Idea:</label>
               <select
+                id="validation-idea-select"
+                aria-label="Select idea for validation matrix"
                 value={selectedIdeaId}
                 onChange={(e) => setSelectedIdeaId(e.target.value)}
                 className="bg-background border rounded-lg px-2.5 py-1.5 text-xs text-foreground font-semibold focus:ring-1 focus:ring-primary focus:outline-none max-w-[200px] xs:max-w-[260px] sm:max-w-xs truncate"
@@ -246,7 +248,7 @@ export function ValidationMatrixView({
                 {readinessScore >= 70 ? 'High Confidence (Build Ready)' : 'Requires More Evidence'}
               </Badge>
             </span>
-            <span className="text-primary font-bold">{readinessScore}%</span>
+            <span className="text-primary font-bold tabular-nums">{readinessScore}%</span>
           </div>
           <Progress value={readinessScore} className="h-2" />
         </div>

@@ -32,3 +32,7 @@ playwright/.auth/
 
 # turbo
 .turbo
+
+# Agent logs and scratch files
+.agents/teamwork/
+

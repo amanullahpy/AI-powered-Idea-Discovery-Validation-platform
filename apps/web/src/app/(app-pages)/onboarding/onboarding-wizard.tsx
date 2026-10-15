@@ -19,15 +19,6 @@ import {
   ArrowRight,
   Check,
   CheckCircle2,
-  Clock,
-  Coins,
-  Globe,
-  GraduationCap,
-  Layers,
-  Rocket,
-  Sparkles,
-  Target,
-  Wrench,
 } from 'lucide-react';
 
 interface TaxonomyCategory {
@@ -118,7 +109,7 @@ export function OnboardingWizard({
     }
   }
 
-  async function handleNext(skipCurrent = false) {
+  async function handleNext(_skipCurrent = false) {
     startTransition(async () => {
       const isLastStep = currentStep === STEPS.length;
 

@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'vitest';
 
-import { getURL, toSiteURL, getSafeRedirectUrl } from './helpers';
+import { getURL, getBaseUrl, toSiteURL, getSafeRedirectUrl } from './helpers';
 
 const originalEnv = {
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
@@ -26,6 +26,7 @@ test('getURL normalizes a configured site URL', () => {
   delete process.env.NEXT_PUBLIC_VERCEL_URL;
 
   expect(getURL()).toBe('https://example.com/');
+  expect(getBaseUrl()).toBe('https://example.com/');
 });
 
 test('getURL falls back to the local dev port', () => {
@@ -33,6 +34,7 @@ test('getURL falls back to the local dev port', () => {
   delete process.env.NEXT_PUBLIC_VERCEL_URL;
 
   expect(getURL()).toBe('http://localhost:3000/');
+  expect(getBaseUrl()).toBe('http://localhost:3000/');
 });
 
 test('toSiteURL joins paths against the normalized base URL', () => {
@@ -46,6 +48,8 @@ test('getSafeRedirectUrl allows valid relative paths', () => {
   const origin = 'https://example.com';
   expect(getSafeRedirectUrl('/settings', origin).toString()).toBe('https://example.com/settings');
   expect(getSafeRedirectUrl('/discover?query=ai', origin).toString()).toBe('https://example.com/discover?query=ai');
+  // Handles origin with trailing slash cleanly
+  expect(getSafeRedirectUrl('/settings', 'https://example.com/').toString()).toBe('https://example.com/settings');
 });
 
 test('getSafeRedirectUrl blocks open redirect attack vectors', () => {
@@ -58,6 +62,10 @@ test('getSafeRedirectUrl blocks open redirect attack vectors', () => {
   expect(getSafeRedirectUrl('/\\evil.com', origin).toString()).toBe('https://example.com/dashboard');
   // Javascript scheme
   expect(getSafeRedirectUrl('javascript:alert(1)', origin).toString()).toBe('https://example.com/dashboard');
+  // Encoded backslash trickery (%5c)
+  expect(getSafeRedirectUrl('/%5cevil.com', origin).toString()).toBe('https://example.com/dashboard');
+  // CRLF injection attempt
+  expect(getSafeRedirectUrl('/\r\nevil.com', origin).toString()).toBe('https://example.com/dashboard');
   // Null or empty
   expect(getSafeRedirectUrl(null, origin).toString()).toBe('https://example.com/dashboard');
 });

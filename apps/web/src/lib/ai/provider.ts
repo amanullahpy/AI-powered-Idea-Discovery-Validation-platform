@@ -1,3 +1,4 @@
+import { env } from '@/config/env';
 import { z } from 'zod';
 import { siteConfig } from '@/config/site';
 import { buildSystemPrompt, PersonaArchetype } from './prompts';
@@ -221,10 +222,10 @@ async function callGroqAPI(
   modelId: string = 'llama-3.3-70b-versatile',
   customKey?: string
 ): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
-  const apiKey = customKey || process.env.GROQ_API_KEY;
+  const apiKey = customKey || env.GROQ_API_KEY;
   if (!apiKey) throw new Error('No Groq API key available');
 
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const res = await fetch(env.GROQ_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -260,10 +261,10 @@ async function callOpenRouterAPI(
   modelId: string = 'meta-llama/llama-3.3-70b-instruct:free',
   customKey?: string
 ): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
-  const apiKey = customKey || process.env.OPENROUTER_API_KEY;
+  const apiKey = customKey || env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error('No OpenRouter API key available');
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  const res = await fetch(env.OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -301,7 +302,7 @@ async function callGeminiAPI(
   modelId: string = 'gemini-2.0-flash',
   customKey?: string
 ): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
-  const apiKey = customKey || process.env.GEMINI_API_KEY;
+  const apiKey = customKey || env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('No Gemini API key available');
 
   // Separate system message if present
@@ -328,7 +329,7 @@ async function callGeminiAPI(
   }
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`,
+    `${env.GEMINI_API_BASE_URL}/models/${modelId}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -384,7 +385,7 @@ async function dispatchAICall(
 
   // 4. Auto Mode: Cascade through available keys
   // A. Try Groq if key exists
-  if (config?.customApiKey || process.env.GROQ_API_KEY) {
+  if (config?.customApiKey || env.GROQ_API_KEY) {
     try {
       const model = requestedModel || 'llama-3.3-70b-versatile';
       const res = await callGroqAPI(messages, model, config?.customApiKey);
@@ -395,7 +396,7 @@ async function dispatchAICall(
   }
 
   // B. Try OpenRouter if key exists
-  if (config?.customApiKey || process.env.OPENROUTER_API_KEY) {
+  if (config?.customApiKey || env.OPENROUTER_API_KEY) {
     try {
       const model = requestedModel || 'meta-llama/llama-3.3-70b-instruct:free';
       const res = await callOpenRouterAPI(messages, model, config?.customApiKey);
@@ -406,7 +407,7 @@ async function dispatchAICall(
   }
 
   // C. Try Gemini if key exists
-  if (config?.customApiKey || process.env.GEMINI_API_KEY) {
+  if (config?.customApiKey || env.GEMINI_API_KEY) {
     try {
       const model = requestedModel || 'gemini-2.0-flash';
       const res = await callGeminiAPI(messages, model, config?.customApiKey);

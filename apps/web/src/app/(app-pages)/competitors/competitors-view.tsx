@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useTransition } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -238,8 +237,10 @@ export function CompetitorsView({ ideas, initialCompetitors = [] }: CompetitorsV
 
           {ideas.length > 0 && (
             <div className="flex items-center gap-2 max-w-full">
-              <span className="text-xs text-muted-foreground hidden sm:inline shrink-0">Compare for Idea:</span>
+              <label htmlFor="competitor-idea-select" className="text-xs text-muted-foreground hidden sm:inline shrink-0">Compare for Idea:</label>
               <select
+                id="competitor-idea-select"
+                aria-label="Select idea for competitor comparison"
                 value={selectedIdeaId}
                 onChange={(e) => setSelectedIdeaId(e.target.value)}
                 className="bg-background border rounded-lg px-2.5 py-1.5 text-xs text-foreground font-semibold focus:ring-1 focus:ring-primary focus:outline-none max-w-[200px] xs:max-w-[260px] sm:max-w-xs truncate"

@@ -94,7 +94,7 @@ export default function Navbar() {
           {user ? (
             <Button asChild size="sm" className="hidden sm:flex font-semibold">
               <Link href="/dashboard">
-                <LayoutDashboard className="size-3.5 mr-1.5" />
+                <LayoutDashboard className="size-3.5 mr-1.5" aria-hidden="true" />
                 Go to Dashboard
               </Link>
             </Button>
@@ -111,9 +111,14 @@ export default function Navbar() {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open navigation menu"
+                className="md:hidden min-h-[44px] min-w-[44px]"
+              >
                 <Menu aria-hidden="true" />
-                <span className="sr-only">Open navigation</span>
+                <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent className="flex w-[min(22rem,85vw)] flex-col">
@@ -128,7 +133,11 @@ export default function Navbar() {
               <nav className="mt-6 grid gap-1">
                 {siteConfig.navigation.map((item) => (
                   <SheetClose asChild key={item.href}>
-                    <Button variant="ghost" asChild className="justify-start">
+                    <Button
+                      variant="ghost"
+                      asChild
+                      className="justify-start min-h-[44px] h-11 text-base px-3"
+                    >
                       <Link href={item.href}>{item.label}</Link>
                     </Button>
                   </SheetClose>
@@ -137,9 +146,9 @@ export default function Navbar() {
               <div className="mt-auto grid gap-2 pt-8">
                 {user ? (
                   <SheetClose asChild>
-                    <Button asChild className="font-semibold">
+                    <Button asChild className="font-semibold min-h-[44px] h-11">
                       <Link href="/dashboard">
-                        <LayoutDashboard className="size-3.5 mr-1.5" />
+                        <LayoutDashboard className="size-3.5 mr-1.5" aria-hidden="true" />
                         Go to Dashboard
                       </Link>
                     </Button>
@@ -147,12 +156,12 @@ export default function Navbar() {
                 ) : (
                   <>
                     <SheetClose asChild>
-                      <Button variant="outline" asChild>
+                      <Button variant="outline" asChild className="min-h-[44px] h-11">
                         <Link href="/login">Sign in</Link>
                       </Button>
                     </SheetClose>
                     <SheetClose asChild>
-                      <Button asChild>
+                      <Button asChild className="min-h-[44px] h-11">
                         <Link href="/sign-up">Get started</Link>
                       </Button>
                     </SheetClose>

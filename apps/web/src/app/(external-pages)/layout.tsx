@@ -35,7 +35,7 @@ export default async function ExternalLayout({ children }: { children: ReactNode
         <AppSidebar />
         <SidebarInset className="min-w-0 overflow-hidden">
           <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-1.5 sm:gap-2 border-b bg-background/90 px-3 sm:px-4 backdrop-blur-md min-w-0">
-            <SidebarTrigger className="-ml-1" />
+            <SidebarTrigger className="-ml-1" aria-label="Toggle sidebar" />
             <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4" />
             <div className="min-w-0 flex-1 overflow-hidden">
               <Suspense fallback={null}>

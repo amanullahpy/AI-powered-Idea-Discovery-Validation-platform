@@ -83,33 +83,33 @@ interface AIChatProps {
 
 const STARTER_PROMPTS = [
   {
-    title: 'B2B Micro-SaaS',
-    description: 'Launch a focused workflow or connector tool in under 14 days.',
-    prompt: 'Give me a B2B micro-SaaS idea I can launch in under 2 weeks with organic distribution.',
+    title: 'Deconstruct Workflow Friction',
+    description: 'Find where B2B teams waste hours on manual spreadsheets & copy-pasting.',
+    prompt: 'Analyze high-friction B2B workflows where teams currently waste 10+ hours a week in spreadsheets. Uncover 3 hair-on-fire problems with immediate willingness to pay.',
   },
   {
-    title: 'Low-Risk Automation',
-    description: 'High-margin automated service with under $100 starting budget.',
-    prompt: 'I have $100 budget. What low-risk automation or workflow business can I start?',
+    title: 'Uncover Clumsy Workarounds',
+    description: 'Target expensive agency or manual processes ripe for lean automation.',
+    prompt: 'What expensive or clumsy manual workaround are SMBs currently tolerating that could be replaced by a lean, single-purpose software tool?',
   },
   {
-    title: 'AI Student / FYP Project',
-    description: 'High-scoring technical AI project with an impressive live demonstration.',
-    prompt: 'Give me a high-scoring final year project (FYP) idea using modern AI agents and web technologies.',
+    title: 'Validate Willingness-to-Pay',
+    description: 'Identify problems backed by existing corporate budgets and clear ROI.',
+    prompt: 'Give me 3 software concepts where the customer already has an allocated budget being wasted on error-prone workarounds.',
   },
   {
-    title: 'Digital Product Hustle',
-    description: 'Recurring cashflow product requiring under 4 hours/week.',
-    prompt: 'High-margin digital product or micro-tool side hustle requiring under 4 hours a week.',
+    title: 'Low-Risk 48-Hour Micro-MVP',
+    description: 'Launchable prototype using Next.js & Supabase under $50 budget.',
+    prompt: 'Design a high-conviction micro-tool I can validate with a smoke test or concierge MVP in under 48 hours for less than $50.',
   },
 ];
 
 const PROMPT_SUGGESTION_CHIPS = [
+  '🔍 Audit status-quo workaround',
+  '💰 Willingness-to-pay check',
   '⚡ Simplify to 48-hr MVP',
-  '💰 3 monetization options',
-  '🎯 Define ICP & pain point',
-  '📊 Market risk & competition',
-  '✉️ Cold pitch email',
+  '🛡️ Find competitor blind spots',
+  '📋 5 Mom-Test interview questions',
 ];
 
 const FOUNDER_TEMPLATES = [
@@ -1095,7 +1095,9 @@ ${idea.whyItFits}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask IdeaForge anything about startup ideas, validation, or pricing..."
+                placeholder="Ask IdeaForge anything about startup ideas, validation, or pricing…"
+                aria-label="Ask IdeaForge AI prompt input"
+                spellCheck={false}
                 className="flex-1 bg-transparent border-0 resize-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none px-2 py-1.5 max-h-36 overflow-y-auto leading-relaxed"
                 disabled={isPending}
               />
@@ -1104,9 +1106,10 @@ ${idea.whyItFits}
                 type="submit"
                 size="icon"
                 disabled={!input.trim() || isPending}
+                aria-label="Send message to AI"
                 className="size-8 rounded-xl shrink-0 transition-all disabled:opacity-40"
               >
-                <ArrowUp className="size-4" />
+                <ArrowUp className="size-4" aria-hidden="true" />
               </Button>
             </form>
 

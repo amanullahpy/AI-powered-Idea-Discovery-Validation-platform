@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment } from 'react';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -18,8 +19,14 @@ const routeLabels: Record<string, string> = {
     discover: 'Discover Ideas',
     ideas: 'My Ideas',
     saved: 'Saved Ideas',
+    validation: 'Validation Matrix',
+    competitors: 'Competitor Moats',
+    trends: 'Market Trends',
+    activity: 'Activity & Audit',
     settings: 'Settings',
     onboarding: 'Onboarding',
+    about: 'About',
+    public: 'Public',
     'private-items': 'Private Items',
     'private-item': 'Private Item',
     item: 'Item',
@@ -48,7 +55,7 @@ export function DynamicBreadcrumb() {
                 <BreadcrumbItem className="shrink-0">
                     <BreadcrumbLink asChild>
                         <Link href="/dashboard" className="flex items-center gap-1">
-                            <Home className="h-3.5 w-3.5 shrink-0" />
+                            <Home className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             <span className="hidden sm:inline">Home</span>
                         </Link>
                     </BreadcrumbLink>
@@ -66,7 +73,7 @@ export function DynamicBreadcrumb() {
                     if (isUUID && !isLast) return null;
 
                     return (
-                        <div key={segment + index} className="flex items-center gap-1 min-w-0">
+                        <Fragment key={`${segment}-${index}`}>
                             <BreadcrumbSeparator className="shrink-0" />
                             <BreadcrumbItem className="min-w-0">
                                 {isLast ? (
@@ -79,7 +86,7 @@ export function DynamicBreadcrumb() {
                                     </BreadcrumbLink>
                                 )}
                             </BreadcrumbItem>
-                        </div>
+                        </Fragment>
                     );
                 })}
             </BreadcrumbList>

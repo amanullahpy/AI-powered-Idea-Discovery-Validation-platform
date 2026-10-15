@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Check,
-  Github,
   Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';

@@ -250,10 +250,11 @@ export function IdeaCard({
               size="sm"
               onClick={handleToggleSave}
               disabled={isPending}
+              aria-label={isSaved ? 'Remove idea from saved bookmarks' : 'Save idea to bookmarks'}
               className={`h-8 px-2.5 text-xs ${isSaved ? 'text-primary' : 'text-muted-foreground'}`}
               title={isSaved ? 'Saved' : 'Save Idea'}
             >
-              <Bookmark className={`size-3.5 mr-1.5 ${isSaved ? 'fill-primary' : ''}`} />
+              <Bookmark className={`size-3.5 mr-1.5 ${isSaved ? 'fill-primary' : ''}`} aria-hidden="true" />
               {isSaved ? 'Saved' : 'Save'}
             </Button>
           )}
@@ -263,10 +264,11 @@ export function IdeaCard({
               variant="ghost"
               size="sm"
               onClick={handleShare}
+              aria-label="Share public link to idea"
               className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
               title="Share Public Link"
             >
-              <Share2 className="size-3.5" />
+              <Share2 className="size-3.5" aria-hidden="true" />
             </Button>
           )}
         </div>

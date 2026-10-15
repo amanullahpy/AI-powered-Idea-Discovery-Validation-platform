@@ -38,13 +38,13 @@ export const EmailAndPassword = ({
     >
       <FieldGroup className="gap-5">
         <Field>
-          <FieldLabel htmlFor={`${view}-email`}>Email address</FieldLabel>
+          <FieldLabel htmlFor="email">Email address</FieldLabel>
           <InputGroup>
             <InputGroupAddon>
               <Mail aria-hidden="true" />
             </InputGroupAddon>
             <InputGroupInput
-              id={`${view}-email`}
+              id="email"
               name="email"
               type="email"
               disabled={isLoading}
@@ -53,18 +53,19 @@ export const EmailAndPassword = ({
               placeholder="email@example.com"
               onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
+              spellCheck={false}
               required
             />
           </InputGroup>
         </Field>
         <Field>
-          <FieldLabel htmlFor={`${view}-password`}>Password</FieldLabel>
+          <FieldLabel htmlFor="password">Password</FieldLabel>
           <InputGroup>
             <InputGroupAddon>
               <LockKeyhole aria-hidden="true" />
             </InputGroupAddon>
             <InputGroupInput
-              id={`${view}-password`}
+              id="password"
               name="password"
               type="password"
               disabled={isLoading}
@@ -72,6 +73,7 @@ export const EmailAndPassword = ({
               placeholder={view === 'sign-in' ? 'Enter your password' : 'Create a password'}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete={view === 'sign-in' ? 'current-password' : 'new-password'}
+              spellCheck={false}
               required
             />
           </InputGroup>

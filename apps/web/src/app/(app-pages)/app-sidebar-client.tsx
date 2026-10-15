@@ -11,6 +11,7 @@ import {
   Lightbulb,
   LogOut,
   Plus,
+  Presentation,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -57,6 +58,7 @@ const ventureNavigation = [
   { title: 'Saved Ideas', url: '/saved', icon: Bookmark },
   { title: 'Validation Matrix', url: '/validation', icon: Target },
   { title: 'Competitor Moats', url: '/competitors', icon: ShieldCheck },
+  { title: 'Pitch Deck & Memo', url: '/pitch', icon: Presentation },
 ];
 
 const systemNavigation = [

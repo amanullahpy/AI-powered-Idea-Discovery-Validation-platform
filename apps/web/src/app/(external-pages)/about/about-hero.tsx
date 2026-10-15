@@ -1,4 +1,4 @@
-import { ArrowRight, Compass, Sparkles } from 'lucide-react';
+import { Compass, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';

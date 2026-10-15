@@ -172,13 +172,15 @@
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     overflow-x: hidden;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
     min-height: 100svh;
   }
 }
@@ -239,4 +241,15 @@
   animation-duration: var(--duration);
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

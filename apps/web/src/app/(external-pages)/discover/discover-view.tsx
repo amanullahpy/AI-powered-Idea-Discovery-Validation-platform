@@ -3,9 +3,8 @@
 import { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { IdeaCard, type IdeaItem } from '@/components/ideas/idea-card';
-import { Compass, Filter, Search, Sparkles, X } from 'lucide-react';
+import { Compass, Search, Sparkles, X } from 'lucide-react';
 
 interface CategoryOption {
   id: string;
@@ -92,11 +91,13 @@ export function DiscoverView({
       {/* Search and Sort controls */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" aria-hidden="true" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by keyword, problem, or technology..."
+            placeholder="Search by keyword, problem, or technology…"
+            aria-label="Search ideas"
+            spellCheck={false}
             className="pl-9 text-sm h-10"
           />
         </div>
